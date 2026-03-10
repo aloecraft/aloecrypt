@@ -19,7 +19,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::error::AloecryptError;
 use crate::keypair::Keypair;
 use crate::peer_key::PeerKey;
-use crate::{MAGIC_BYTES, PrivKey, PubKey};
+use crate::consts::MAGIC_BYTES;
+use crate::{PrivKey, PubKey};
 
 pub const MAX_FOOTER_BYTES: usize = 65536;
 pub const FOOTER_LEN_BYTES: usize = 2;

@@ -19,7 +19,7 @@ use std::fmt::Write;
 use super::KeyPEM;
 use crate::error::AloecryptError;
 use crate::keypair::Keypair;
-use crate::{COM_STRUCT_ID, KEY_ITERS};
+use crate::consts::{COM_STRUCT_ID, KEY_ITERS};
 
 #[derive(Debug, Clone)]
 pub struct Keyfile {

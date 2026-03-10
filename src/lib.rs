@@ -18,12 +18,11 @@ pub mod error;
 pub mod keyfile;
 pub mod keypair;
 pub mod peer_key;
-
-pub const KEY_ITERS: u32 = 4096;
-pub const COM_STRUCT_ID: &str = "AloeBuffer.0";
-pub const MAGIC_BYTES: [u8; 16] = [
-    0x41, 0x4c, 0x4f, 0x45, 0x43, 0x52, 0x59, 0x50, 0x54, 0x69, 0x61, 0x6d, 0x6d, 0x69, 0x6b, 0x65,
-];
+pub mod consts;
+pub mod traits;
+pub mod kem;
+pub mod signatory;
+pub mod session;
 
 use chacha20poly1305::Key as ChaChaKey;
 use ed25519_dalek::Signature;

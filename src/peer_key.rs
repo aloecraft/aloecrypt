@@ -23,7 +23,7 @@ use crate::curve_convert::to_curve25519_public_key;
 use crate::error::AloecryptError;
 
 // Make sure these are accessible from wherever you place this file
-use crate::{COM_STRUCT_ID, KEY_ITERS};
+use crate::consts::{COM_STRUCT_ID, KEY_ITERS};
 
 // Define the trait with the expected operations
 #[derive(Debug, Clone)]

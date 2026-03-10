@@ -15,6 +15,46 @@ use chacha20poly1305::Error as ChaChaError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq, Eq)]
+pub enum AloecryptSessionError {
+    #[error("Received address does not match session address")]
+    AddressMismatch,
+    #[error("Session HELLO data missing")]
+    MissingHELLO,
+    #[error("Session SYN data missing")]
+    MissingSYN,
+    #[error("Error attempting to generate KEM with incomplete data")]
+    IncompleteKEMData,
+    #[error("Error encapsulating session shared secrets")]
+    EncapsulateError,
+    #[error("Error decapsulating session shared secrets")]
+    DecapsulateError,
+    #[error("Error self signature not signed")]
+    SelfCipherNotSignedError,
+    #[error("Error validating session counterpart signature")]
+    SignatureValidationError,
+    #[error("Error encrypting message")]
+    SendEncryptError(ChaChaError),
+    #[error("Error decrypting message")]
+    RecvDecryptError(ChaChaError),
+    #[error("Error decrypting handshake cipher challenge")]
+    CipherTestError,
+    #[error("Error: Cipher not yet created for session")]
+    CipherNotReady,
+    #[error("Error PartyINTRO not yet received for counter party")]
+    NoCounterPartyINTRO,
+    #[error("Error PartyCIPHER not yet received for counter party")]
+    NoCounterPartyCIPHER,
+    #[error("Error PartyCHALLENGE not yet received for counter party")]
+    NoCounterPartyCHALLENGE,
+    #[error("Error PartyCHALLENGE did not contain a valid check")]
+    CounterPartyCheckMismatch,
+    #[error("Error PartyRESPONSE did not contain a valid challenge response")]
+    CounterPartyChallengeMismatch,
+    #[error("Error SessionBuilder not ready")]
+    BuildNotReady
+}
+
+#[derive(Error, Debug, PartialEq, Eq)]
 pub enum AloecryptError {
     #[error("Invalid Ed25519 public key: point decompression failed")]
     InvalidPublicKey,
@@ -25,11 +65,20 @@ pub enum AloecryptError {
     #[error("Invalid PEM format or corrupted data")]
     InvalidPemFormat,
 
+    #[error("Invalid PEM format or corrupted data")]
+    InvalidPemTags,
+
+    #[error("Invalid PEM format or corrupted data")]
+    InvalidPemLength,
+
     #[error("Serialization/Deserialization failed")]
     Serialization,
 
     #[error("Compression/Decompression failed")]
     Compression,
+
+    #[error("Signature Verification failed")]
+    Signature,
 }
 
 // Manually implement From to bypass the std::error::Error trait bound requirement for the AEAD error

@@ -24,7 +24,7 @@ use super::{KeyPEM, PrivKey, PubKey};
 use crate::curve_convert::{to_curve25519_private_key, to_curve25519_public_key};
 use crate::error::AloecryptError;
 
-use crate::{COM_STRUCT_ID, KEY_ITERS};
+use crate::consts::{COM_STRUCT_ID, KEY_ITERS};
 
 #[derive(Debug, Clone)]
 pub struct Keypair {
