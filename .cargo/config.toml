@@ -1,0 +1,6 @@
+[target.wasm32-wasip2]
+rustflags = ["-C", "link-args=-z stack-size=8388608"]  # 8MB
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-bindgen-test-runner"
+rustflags = ["-C", "link-args=--stack-first -z stack-size=8388608"]

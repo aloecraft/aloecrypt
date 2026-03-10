@@ -35,7 +35,7 @@ zerocopy = "0.8.40"
 hybrid-array = "0.4.7"
 hkdf = "0.12.4"
 hex-literal = "1.1.0"
-
+futures = "0.3"
 
 # Not Browser
 [target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
@@ -43,6 +43,11 @@ uuid = {version = "1.20.0",features = ["v4", "v7", "fast-rng"]}
 
 # Browser only
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+gloo-timers = { version = "0.3", features = ["futures"] }
+web-time = "1.1"
+instant = { version = "0.1", features = ["wasm-bindgen"] }
 uuid = {version = "1.20.0",features = ["v4", "v7", "fast-rng", "js"]}
 getrandom = { version = "0.2", features = ["js"] }
 
@@ -50,3 +55,5 @@ getrandom = { version = "0.2", features = ["js"] }
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 x25519-dalek = { version = "2.0", features = ["static_secrets"] }
 rand_core = { version = "0.6", features = ["std"] }
+wasm-bindgen-test = "0.3.12"
+tokio-test = "0.4"

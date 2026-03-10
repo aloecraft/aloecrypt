@@ -10,7 +10,10 @@ use aloecrypt::consts::*;
 use aloecrypt::traits::{AloecryptDecapsulator, AloecryptEncapsulator, AloecryptPEM, AloecryptSignable, AloecryptSigner, AloecryptVerifier, AloecryptPasswordPEM};
 use chacha20poly1305::Nonce;
 
-#[test]
+mod common;
+use common::common::test as crosstest;
+
+#[crosstest]
 fn load_and_unload_pem() {
     let mut os_rng = OsRng;
 
@@ -41,7 +44,7 @@ fn load_and_unload_pem() {
     let loaded_kyber_public_kem = KyberPublicKEM::loads(kyber_public_file.as_str()).unwrap();
 }
 
-#[test]
+#[crosstest]
 fn verify_loaded_pem() {
     let mut os_rng = OsRng;
 

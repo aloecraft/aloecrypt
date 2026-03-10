@@ -10,7 +10,10 @@ use aloecrypt::consts::*;
 
 use aloecrypt::traits::{AloecryptDecapsulator, AloecryptEncapsulator, AloecryptSignable, AloecryptSigner, AloecryptVerifier};
 
-#[test]
+mod common;
+use common::common::test as crosstest;
+
+#[crosstest]
 fn instantiate_and_verify_signatures() {
     let mut os_rng = OsRng;
     let dlt_active_from =  EMPTY_TIMESTAMP;
@@ -45,7 +48,7 @@ fn instantiate_and_verify_signatures() {
     }
 }
 
-#[test]
+#[crosstest]
 fn sign_and_verify() {
     let mut os_rng = OsRng;
     let dlt_active_from =  EMPTY_TIMESTAMP;
@@ -89,7 +92,7 @@ fn sign_and_verify() {
     }
 }
 
-#[test]
+#[crosstest]
 fn encapsultate_and_decapsulate_secret() {
     let mut os_rng = OsRng;
     let dlt_active_from =  EMPTY_TIMESTAMP;
@@ -112,7 +115,7 @@ fn encapsultate_and_decapsulate_secret() {
 }
 
 
-#[test]
+#[crosstest]
 fn encapsultate_and_decapsulate() {
     let mut os_rng = OsRng;
     let dlt_active_from =  EMPTY_TIMESTAMP;

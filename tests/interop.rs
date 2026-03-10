@@ -19,7 +19,11 @@ struct TestMetadata {
     app_id: String,
 }
 
-#[test]
+mod common;
+use common::common::test as crosstest;
+
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
+#[crosstest]
 fn test_python_to_rust_interop() {
     let base_dir = "./.test_vectors"; // Path to where Python saved the files
     let password = b"interop_password";

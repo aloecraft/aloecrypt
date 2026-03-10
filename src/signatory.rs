@@ -7,8 +7,8 @@ use ml_dsa::{KeyGen, KeyPair, MlDsa44, MlDsa65, MlDsa87, Signature, SigningKey, 
 use ml_kem::{EncodedSizeUser, KemCore, MlKem768, MlKem768Params, SharedKey, array::Array, B32};
 use pbkdf2::pbkdf2_hmac;
 use std::fmt::Write;
-use std::time::SystemTime;
-use std::time::UNIX_EPOCH;
+use crate::time::SystemTime;
+use crate::time::UNIX_EPOCH;
 use rand_core::RngCore;
 
 const SIGNER_PEM_TAG: &str = "Aloecrypt DilithiumSigner";

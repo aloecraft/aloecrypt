@@ -21,6 +21,7 @@ pub mod peer_key;
 pub mod consts;
 pub mod traits;
 pub mod kem;
+pub mod time;
 pub mod signatory;
 pub mod session;
 

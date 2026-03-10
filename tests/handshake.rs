@@ -21,6 +21,9 @@ struct TestParty {
     secure_session: Option<SessionBuilder>,
 }
 
+mod common;
+use common::common::test as crosstest;
+
 impl TestParty {
     fn new() -> Self {
         let mut os_rng = OsRng;
@@ -105,7 +108,7 @@ fn perform_handshake(
     Ok(())
 }
 
-#[test]
+#[crosstest]
 fn test_full_handshake_and_bidirectional_messaging() {
     let mut party_a = TestParty::new();
     let mut party_b = TestParty::new();
@@ -137,7 +140,7 @@ fn test_full_handshake_and_bidirectional_messaging() {
     assert_eq!(decrypted_b, plaintext_b, "B→A message mismatch");
 }
 
-#[test]
+#[crosstest]
 fn test_handshake_intro_step_is_required_before_cipher() {
     let mut party_a = TestParty::new();
     let mut party_b = TestParty::new();
@@ -159,7 +162,7 @@ fn test_handshake_intro_step_is_required_before_cipher() {
     );
 }
 
-#[test]
+#[crosstest]
 fn test_wrong_challenge_response_is_rejected() {
     use aloecrypt::session::builder::PartyRESPONSE;
     let mut party_a = TestParty::new();

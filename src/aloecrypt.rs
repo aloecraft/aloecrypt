@@ -14,8 +14,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::{Read, Write};
-use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::time::{SystemTime, UNIX_EPOCH};
 use crate::error::AloecryptError;
 use crate::keypair::Keypair;
 use crate::peer_key::PeerKey;
