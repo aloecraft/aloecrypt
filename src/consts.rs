@@ -1,3 +1,5 @@
+// src/consts.rs
+// License: Apache-2.0 (disclaimer at bottom of file)
 use hex_literal::hex;
 use std::mem;
 pub const KEY_ITERS: u32 = 4096;
@@ -34,22 +36,17 @@ pub const SESSION_SALT_SZ: usize = 32;
 pub const SESSION_SALT_HASH_ITERS: u32 = 512;
 pub const ENCRYPTED_TAG_SZ: usize = 16; // CHACHA20POLY1305
 pub const ENCRYPTED_NONCE_SZ: usize = SESSION_NONCE_SZ + 2 * ENCRYPTED_TAG_SZ;
-
 pub const U32_SZ: usize = mem::size_of::<u32>();
 pub const U64_SZ: usize = mem::size_of::<u64>();
-
 pub const EMPTY_CRYPT_KEY: [u8; CHACHA_KEY_SZ] = [0u8; CHACHA_KEY_SZ];
 pub const EMPTY_CRYPT_NONCE: [u8; CHACHA_NONCE_SZ] = [0u8; CHACHA_NONCE_SZ];
-
 pub const EMPTY_VERIFY_KEY: [u8; VERIFY_KEY_SZ] = [0u8; VERIFY_KEY_SZ];
 pub const EMPTY_SIGN_KEY: [u8; SIGN_KEY_SZ] = [0u8; SIGN_KEY_SZ];
 pub const EMPTY_ENCRYPTED_SIGN_KEY: [u8; ENCRYPTED_SIGN_KEY_SZ] = [0u8; ENCRYPTED_SIGN_KEY_SZ];
-
 pub const EMPTY_ENCAPSULATE_KEY: [u8; ENCAPSULATE_KEY_SZ] = [0u8; ENCAPSULATE_KEY_SZ];
 pub const EMPTY_DECAPSULATE_KEY: [u8; DECAPSULATE_KEY_SZ] = [0u8; DECAPSULATE_KEY_SZ];
 pub const EMPTY_ENCRYPTED_DECAPSULATE_KEY: [u8; ENCRYPTED_DECAPSULATE_KEY_SZ] =
     [0u8; ENCRYPTED_DECAPSULATE_KEY_SZ];
-
 pub const EMPTY_SESSION_NONCE: [u8; SESSION_NONCE_SZ] = [0u8; SESSION_NONCE_SZ];
 pub const EMPTY_SESSION_SALT: [u8; SESSION_SALT_SZ] = [0u8; SESSION_SALT_SZ];
 pub const EMPTY_SECRET: [u8; SECRET_SZ] = [0u8; SECRET_SZ];
@@ -58,7 +55,6 @@ pub const EMPTY_ADDRESS: [u8; ADDRESS_SZ] = [0u8; ADDRESS_SZ];
 pub const EMPTY_TIMESTAMP: [u8; TIMESTAMP_SZ] = [0u8; TIMESTAMP_SZ];
 pub const EMPTY_CIPHER: [u8; CIPHER_SZ] = [0u8; CIPHER_SZ];
 pub const EMPTY_HASH: [u8; HASH_SZ] = [0u8; HASH_SZ];
-
 pub const HASH_SEED_DLT_PUBKEY: &str = "AloecryptDltPubKey.0";
 pub const HASH_SEED_DLT_PRIVKEY: &str = "AloecryptDltPrivKey.0";
 pub const HASH_SEED_KYB_PUBKEY: &str = "AloecryptKybPubKey.0";
@@ -69,7 +65,6 @@ pub const HASH_SEED_DLT_VERIFIER: &str = "AloecryptDltVerifier.10";
 pub const HASH_SEED_KYB_FULLKEM: &str = "AloecryptKybFullKEM.10";
 pub const HASH_SEED_KYB_X_FULLKEM: &str = "AloecryptKybXFullKEM.10";
 pub const HASH_SEED_KYB_PUBKEM: &str = "AloecryptKybPubKEM.10";
-
 pub const HASH_SEED_PARTY_INTRO: &str = "AloecryptPARTY_INTRO.001";
 pub const HASH_SEED_PARTY_CIPHER: &str = "AloecryptPARTY_CIPHER.001";
 pub const HASH_SEED_FULL_CIPHER: &str = "AloecryptFULL_CIPHER.001";
@@ -89,18 +84,15 @@ pub const HASH_SEED_COUNTER_PARTY: &str = "AloecryptCOUNTER_PARTY.001";
 pub const HASH_SEED_SESSION: &str = "AloecryptSESSION.001";
 pub const HASH_SEED_SESSION_PRIV: &str = "AloecryptSESSION_PRIV.001";
 pub const HASH_SEED_X_SESSION: &str = "AloecryptX_SESSION.001";
-
 pub const ADDRESS_SEED_DLT_SIGNER: &str = "AloecryptDltSigner.0";
 pub const ADDRESS_SEED_DLT_VERIFIER: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptDltVerifier.0";
 pub const ADDRESS_SEED_KYB_FULLKEM: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptKybFullKEM.0";
 pub const ADDRESS_SEED_KYB_X_FULLKEM: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptKybXFullKEM.0";
 pub const ADDRESS_SEED_KYB_PUBKEM: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptKybPubKEM.0";
-
 pub const ADDRESS_SEED_SESSION: &str = "AloecryptSession.0";
 pub const ADDRESS_SEED_SESSION_BUILDER: &str = "AloecryptSessionBuilder.0";
 pub const ADDRESS_SEED_PARTY: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptParty.0";
 pub const ADDRESS_SEED_COUNTER_PARTY: &str = ADDRESS_SEED_DLT_SIGNER; // "AloecryptCounterParty.0";
-
 pub const SESSION_PEM_TAG: &str = "Aloecrypt Session";
 pub const MSG_HELLO_PEM_TAG: &str = "Aloecrypt MsgHELLO";
 pub const MSG_SYN_PEM_TAG: &str = "Aloecrypt MsgSYN";
@@ -110,23 +102,32 @@ pub const MSG_WELCOME_PEM_TAG: &str = "Aloecrypt MsgWELCOME";
 pub const MSG_GOODBYE_PEM_TAG: &str = "Aloecrypt MsgGOODBYE";
 pub const MSG_RETRY_PEM_TAG: &str = "Aloecrypt MsgRETRY";
 pub const MSG_RESYN_PEM_TAG: &str = "Aloecrypt MsgRESYN";
-
 pub const SESSION_SALT_INFO: [u8; 10] = hex!("f0f1f2f3f4f5f6f7f8f9");
 pub const SESSION_CHACHA_KEY_INFO: [u8; 10] = hex!("e0f1f2f3f4f5f6f7f8f9");
 pub const SESSION_CHACHA_NONCE_INFO: [u8; 10] = hex!("d0f1f2f3f4f5f6f7f8f9");
 pub const SESSION_MSG_NONCE_INFO: [u8; 10] = hex!("c0f1f2f3f4f5f6f7f8f9");
-
 pub const STABLE_SALT_INFO: [u8; 10] = hex!("f1f1f2f3f4f5f6f7f8f9");
 pub const STABLE_CHACHA_KEY_INFO: [u8; 10] = hex!("e1f1f2f3f4f5f6f7f8f9");
 pub const STABLE_CHACHA_NONCE_INFO: [u8; 10] = hex!("d1f1f2f3f4f5f6f7f8f9");
 pub const STABLE_MSG_NONCE_INFO: [u8; 10] = hex!("c1f1f2f3f4f5f6f7f8f9");
-
 pub const NONCE_SYN_STABLE_SEED: &str = "AloecryptSYN.0";
 pub const NONCE_SYN_SESSION_SEED: &str = "AloecryptSYN.1";
 pub const NONCE_ACK_STABLE_SEED: &str = "AloecryptACK.0";
 pub const NONCE_ACK_SESSION_SEED: &str = "AloecryptACK.1";
 pub const NONCE_SYNACK_STABLE_SEED: &str = "AloecryptSYNACK.0";
 pub const NONCE_SYNACK_SESSION_SEED: &str = "AloecryptSYNACK.1";
-
 pub const NONCE_MSG_STABLE_SEED: &str = "AloecryptMSG.0";
 pub const NONCE_MSG_SESSION_SEED: &str = "AloecryptMSG.1";
+// Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>
+//
+// Licensed under the Apache License, Version 2.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.

@@ -1,3 +1,5 @@
+// src/signatory/mod.rs
+// License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
 use crate::consts::*;
 use crate::crypt::*;
@@ -22,18 +24,17 @@ pub mod signature;
 pub mod signer;
 pub mod verifier;
 
+pub use addressable::*;
 pub use empty::*;
 pub use hashable::*;
+pub use jwt::*;
+pub use password::*;
+pub use password_pem::*;
 pub use pem::*;
 pub use signable::*;
 pub use signature::*;
 pub use signer::*;
 pub use verifier::*;
-// pub use keys::*;
-pub use addressable::*;
-pub use jwt::*;
-pub use password::*;
-pub use password_pem::*;
 
 const SIGNER_PEM_TAG: &str = "Aloecrypt DilithiumSigner";
 const VERIFIER_PEM_TAG: &str = "Aloecrypt DilithiumVerifier";
@@ -45,29 +46,16 @@ fn _ts_bytes_now() -> [u8; 8] {
         .unwrap_or_default()
         .as_millis() as u64;
     ms.to_le_bytes()
-}
-
-// fn _signatory_address(dlt_pubkey: [u8; VERIFY_KEY_SZ]) -> [u8; ADDRESS_SZ] {
-//     let mut addr = [0u8; ADDRESS_SZ];
-//     pbkdf2_hmac::<sha2::Sha256>(
-//         dlt_pubkey.as_slice(),
-//         COM_STRUCT_ID.as_bytes(),
-//         KEY_ITERS,
-//         &mut addr,
-//     );
-//     addr
-// }
-// fn _address(address_seed: &str, addressing_material:vec<u8>) -> AloecryptAddress {
-//     let mut aloecrypt_address = EMPTY_ADDRESS;
-//     let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, &address_seed.as_bytes());
-//     hk.expand(&addressing_material, &mut aloecrypt_address)
-//         .expect("aloecrypt_address from addressing_material material");
-//     aloecrypt_address
-// }
-// fn _hash(hash_seed: &str, hashing_material:vec<u8>) -> AloecryptHash {
-//     let mut aloecrypt_hash = EMPTY_HASH;
-//     let hk = hkdf::Hkdf::<sha2::Sha256>::new(None, &hash_seed.as_bytes());
-//     hk.expand(&hashing_material, &mut aloecrypt_hash)
-//         .expect("aloecrypt_hash from hashing material");
-//     aloecrypt_hash
-// }
+} // Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>
+//
+// Licensed under the Apache License, Version 2.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.

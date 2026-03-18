@@ -1,16 +1,18 @@
+// src/bin/generate.rs
+// License: Apache-2.0 (disclaimer at bottom of file)
 use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM, XKyberFullKEM};
 use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier, XDilithiumSigner};
 
+use aloecrypt::session::builder::FromSecretsInput;
 use aloecrypt::session::builder::{
     CounterPartyCHALLENGE, CounterPartySECRET, FullCIPHER, PartyCHALLENGE, PartyCIPHER, PartyINTRO,
     PartyRESPONSE, SessionBuilder,
 };
 use aloecrypt::session::message::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
-use aloecrypt::session::message::{MsgGOODBYE, MsgRETRY, MsgRESYN};
-use aloecrypt::session::party::{XParty, XCounterParty};
+use aloecrypt::session::message::{MsgGOODBYE, MsgRESYN, MsgRETRY};
+use aloecrypt::session::party::{XCounterParty, XParty};
 use aloecrypt::session::session::XAloecryptSession;
 use aloecrypt::session::{AloecryptSession, CounterParty, Party};
-use aloecrypt::session::builder::FromSecretsInput;
 
 use aloecrypt::traits::AloecryptEmpty;
 use regex::Regex;
@@ -147,32 +149,192 @@ fn generate_traits_py() {
     // (prefix, python_class, python_import, traits)
     // Each trait maps to a fixed set of methods with known signatures.
     let bindings: &[(&str, &str, &str, &[&str])] = &[
-        ("dilithium_signer", "DilithiumSigner", "aloecrypt.signatory", &["addressable", "signable", "hashable", "signer", "verifier", "password_pem", "empty"]),
-        ("dilithium_verifier", "DilithiumVerifier", "aloecrypt.signatory", &["addressable", "signable", "hashable", "verifier", "pem", "empty"]),
-        ("x_dilithium_signer", "XDilithiumSigner", "aloecrypt.signatory", &["addressable", "pem", "empty"]),
-        ("kyber_kem", "KyberFullKEM", "aloecrypt.kem", &["addressable", "signable", "hashable", "encapsulator", "decapsulator", "password_pem", "empty"]),
-        ("kyber_public_kem", "KyberPublicKEM", "aloecrypt.kem", &["addressable", "signable", "hashable", "encapsulator", "pem", "empty"]),
-        ("x_kyber_kem", "XKyberFullKEM", "aloecrypt.kem", &["addressable", "pem", "empty"]),
-        ("session", "AloecryptSession", "aloecrypt.session", &["addressable", "hashable", "password_pem", "empty"]),
-        ("x_session", "XAloecryptSession", "aloecrypt.session", &["pem", "empty"]),
-        ("session_builder", "SessionBuilder", "aloecrypt.session.builder", &["addressable", "hashable", "empty"]),
-        ("party_intro", "PartyINTRO", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("party_cipher", "PartyCIPHER", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("party_challenge", "PartyCHALLENGE", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("party_response", "PartyRESPONSE", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("counter_party_secret", "CounterPartySECRET", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("counter_party_challenge", "CounterPartyCHALLENGE", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("from_secrets_input", "FromSecretsInput", "aloecrypt.session.builder", &["hashable", "empty"]),
-        ("party", "Party", "aloecrypt.session", &["addressable", "hashable", "empty"]),
-        ("counter_party", "CounterParty", "aloecrypt.session", &["addressable", "hashable", "empty"]),
-        ("msg_hello", "MsgHELLO", "aloecrypt.session.message", &["hashable", "pem", "empty"]),
-        ("msg_syn", "MsgSYN", "aloecrypt.session.message", &["hashable", "pem", "empty"]),
-        ("msg_ack", "MsgACK", "aloecrypt.session.message", &["hashable", "pem", "empty"]),
-        ("msg_synack", "MsgSYNACK", "aloecrypt.session.message", &["hashable", "pem", "empty"]),
-        ("msg_welcome", "MsgWELCOME", "aloecrypt.session.message", &["hashable", "pem", "empty"]),
-        ("msg_goodbye", "MsgGOODBYE", "aloecrypt.session.message", &["pem", "empty"]),
-        ("msg_retry", "MsgRETRY", "aloecrypt.session.message", &["pem", "empty"]),
-        ("msg_resyn", "MsgRESYN", "aloecrypt.session.message", &["pem", "empty"]),
+        (
+            "dilithium_signer",
+            "DilithiumSigner",
+            "aloecrypt.signatory",
+            &[
+                "addressable",
+                "signable",
+                "hashable",
+                "signer",
+                "verifier",
+                "password_pem",
+                "empty",
+            ],
+        ),
+        (
+            "dilithium_verifier",
+            "DilithiumVerifier",
+            "aloecrypt.signatory",
+            &[
+                "addressable",
+                "signable",
+                "hashable",
+                "verifier",
+                "pem",
+                "empty",
+            ],
+        ),
+        (
+            "x_dilithium_signer",
+            "XDilithiumSigner",
+            "aloecrypt.signatory",
+            &["addressable", "pem", "empty"],
+        ),
+        (
+            "kyber_kem",
+            "KyberFullKEM",
+            "aloecrypt.kem",
+            &[
+                "addressable",
+                "signable",
+                "hashable",
+                "encapsulator",
+                "decapsulator",
+                "password_pem",
+                "empty",
+            ],
+        ),
+        (
+            "kyber_public_kem",
+            "KyberPublicKEM",
+            "aloecrypt.kem",
+            &[
+                "addressable",
+                "signable",
+                "hashable",
+                "encapsulator",
+                "pem",
+                "empty",
+            ],
+        ),
+        (
+            "x_kyber_kem",
+            "XKyberFullKEM",
+            "aloecrypt.kem",
+            &["addressable", "pem", "empty"],
+        ),
+        (
+            "session",
+            "AloecryptSession",
+            "aloecrypt.session",
+            &["addressable", "hashable", "password_pem", "empty"],
+        ),
+        (
+            "x_session",
+            "XAloecryptSession",
+            "aloecrypt.session",
+            &["pem", "empty"],
+        ),
+        (
+            "session_builder",
+            "SessionBuilder",
+            "aloecrypt.session.builder",
+            &["addressable", "hashable", "empty"],
+        ),
+        (
+            "party_intro",
+            "PartyINTRO",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "party_cipher",
+            "PartyCIPHER",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "party_challenge",
+            "PartyCHALLENGE",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "party_response",
+            "PartyRESPONSE",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "counter_party_secret",
+            "CounterPartySECRET",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "counter_party_challenge",
+            "CounterPartyCHALLENGE",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "from_secrets_input",
+            "FromSecretsInput",
+            "aloecrypt.session.builder",
+            &["hashable", "empty"],
+        ),
+        (
+            "party",
+            "Party",
+            "aloecrypt.session",
+            &["addressable", "hashable", "empty"],
+        ),
+        (
+            "counter_party",
+            "CounterParty",
+            "aloecrypt.session",
+            &["addressable", "hashable", "empty"],
+        ),
+        (
+            "msg_hello",
+            "MsgHELLO",
+            "aloecrypt.session.message",
+            &["hashable", "pem", "empty"],
+        ),
+        (
+            "msg_syn",
+            "MsgSYN",
+            "aloecrypt.session.message",
+            &["hashable", "pem", "empty"],
+        ),
+        (
+            "msg_ack",
+            "MsgACK",
+            "aloecrypt.session.message",
+            &["hashable", "pem", "empty"],
+        ),
+        (
+            "msg_synack",
+            "MsgSYNACK",
+            "aloecrypt.session.message",
+            &["hashable", "pem", "empty"],
+        ),
+        (
+            "msg_welcome",
+            "MsgWELCOME",
+            "aloecrypt.session.message",
+            &["hashable", "pem", "empty"],
+        ),
+        (
+            "msg_goodbye",
+            "MsgGOODBYE",
+            "aloecrypt.session.message",
+            &["pem", "empty"],
+        ),
+        (
+            "msg_retry",
+            "MsgRETRY",
+            "aloecrypt.session.message",
+            &["pem", "empty"],
+        ),
+        (
+            "msg_resyn",
+            "MsgRESYN",
+            "aloecrypt.session.message",
+            &["pem", "empty"],
+        ),
     ];
 
     let mut out = String::new();
@@ -180,7 +342,8 @@ fn generate_traits_py() {
     out.push_str("from aloecrypt._plugin import _pack, _unpack, plugin\n\n");
 
     // Collect imports by module
-    let mut imports: std::collections::BTreeMap<&str, Vec<&str>> = std::collections::BTreeMap::new();
+    let mut imports: std::collections::BTreeMap<&str, Vec<&str>> =
+        std::collections::BTreeMap::new();
     for (_, class, module, _) in bindings {
         imports.entry(module).or_default().push(class);
     }
@@ -208,25 +371,34 @@ r#"
                 }
                 "signable" => {
                     out.push_str(&format!(
-r#"
+                        r#"
 {cls}.signing_material = lambda self: plugin.call("{pfx}_signing_material", _pack(self))
 {cls}.signature_bytes = lambda self: plugin.call("{pfx}_signature", _pack(self))
 {cls}.signed_by = lambda self: plugin.call("{pfx}_signed_by", _pack(self))
-"#, cls=class, pfx=prefix));
+"#,
+                        cls = class,
+                        pfx = prefix
+                    ));
                 }
                 "hashable" => {
                     out.push_str(&format!(
-r#"
+                        r#"
 {cls}.hash = lambda self: plugin.call("{pfx}_hash", _pack(self))
-"#, cls=class, pfx=prefix));
+"#,
+                        cls = class,
+                        pfx = prefix
+                    ));
                 }
                 "signer" => {
                     out.push_str(&format!(
-r#"
+                        r#"
 {cls}.sign = lambda self, message: plugin.call("{pfx}_sign", _pack(self, message))
 {cls}.sign_hex = lambda self, message: self.sign(message).hex()
 {cls}.may_sign = lambda self: bool(plugin.call("{pfx}_may_sign", _pack(self))[0])
-"#, cls=class, pfx=prefix));
+"#,
+                        cls = class,
+                        pfx = prefix
+                    ));
                 }
                 "verifier" => {
                     out.push_str(&format!(
@@ -252,12 +424,15 @@ r#"
                 }
                 "encapsulator" => {
                     out.push_str(&format!(
-r#"
+                        r#"
 def _{pfx}_encapsulate(self):
     result = _unpack(plugin.call("{pfx}_encapsulate", _pack(self)))
     return bytes(result[0]), bytes(result[1])
 {cls}.encapsulate = _{pfx}_encapsulate
-"#, cls=class, pfx=prefix));
+"#,
+                        cls = class,
+                        pfx = prefix
+                    ));
                 }
                 "decapsulator" => {
                     out.push_str(&format!(
@@ -351,9 +526,7 @@ pub fn main() {
     tracer
         .trace_value(&mut samples, &FromSecretsInput::empty())
         .unwrap();
-    tracer
-        .trace_value(&mut samples, &XParty::empty())
-        .unwrap();
+    tracer.trace_value(&mut samples, &XParty::empty()).unwrap();
     tracer
         .trace_value(&mut samples, &XCounterParty::empty())
         .unwrap();
@@ -384,7 +557,16 @@ pub fn main() {
         ),
         (
             "python/session/message.py",
-            &["MsgACK", "MsgHELLO", "MsgSYN", "MsgSYNACK", "MsgWELCOME", "MsgGOODBYE", "MsgRETRY", "MsgRESYN"],
+            &[
+                "MsgACK",
+                "MsgHELLO",
+                "MsgSYN",
+                "MsgSYNACK",
+                "MsgWELCOME",
+                "MsgGOODBYE",
+                "MsgRETRY",
+                "MsgRESYN",
+            ],
         ),
         (
             "python/session/__init__.py",
@@ -436,13 +618,17 @@ pub fn main() {
         let cleaned = re_uint32.replace_all(&cleaned, "int").to_string();
         let cleaned = re_uint64.replace_all(&cleaned, "int").to_string();
         let cleaned = re_serde_import.replace_all(&cleaned, "").to_string();
-        let cleaned = re_class.replace_all(&cleaned, "class $1(_PluginModel):").to_string();
+        let cleaned = re_class
+            .replace_all(&cleaned, "class $1(_PluginModel):")
+            .to_string();
         let cleaned = format!("from aloecrypt._plugin import _PluginModel\n{}", cleaned);
         let cleaned = cleaned.replace("@dataclass(frozen=True)\n", "");
         let cleaned = cleaned.replace("from dataclasses import dataclass\n", "");
         let cleaned = cleaned.replace("import typing\n", "");
         let cleaned = cleaned.replace("# pyre-strict\n", "");
-        let cleaned = re_class.replace_all(&cleaned, "class $1(_PluginModel):").to_string();
+        let cleaned = re_class
+            .replace_all(&cleaned, "class $1(_PluginModel):")
+            .to_string();
 
         std::fs::create_dir_all(std::path::Path::new(filename).parent().unwrap()).unwrap();
         std::fs::write(filename, cleaned).unwrap();
@@ -450,3 +636,16 @@ pub fn main() {
     }
     println!("Registry keys: {:?}", registry.keys().collect::<Vec<_>>());
 }
+// Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>
+//
+// Licensed under the Apache License, Version 2.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
