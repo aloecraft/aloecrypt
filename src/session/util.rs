@@ -1,9 +1,4 @@
-use chacha20poly1305::aead::{Aead, KeyInit, Payload};
-use chacha20poly1305::{ChaCha20Poly1305, Key as ChaChaKey, Nonce};
-
-use hkdf::{Hkdf, HkdfExtract};
-use hybrid_array::Array;
-use zerocopy::IntoBytes;
+use super::*;
 use crate::consts::*;
 
 pub fn make_chacha_nonce(
@@ -18,7 +13,11 @@ pub fn make_chacha_nonce(
     chacha_nonce
 }
 
-pub fn nonce_pair(session_salt: &[u8; SESSION_SALT_SZ], session_seed: &str, stable_seed: &str)->([u8; CHACHA_NONCE_SZ],[u8; CHACHA_NONCE_SZ]){
+pub fn nonce_pair(
+    session_salt: &[u8; SESSION_SALT_SZ],
+    session_seed: &str,
+    stable_seed: &str,
+) -> ([u8; CHACHA_NONCE_SZ], [u8; CHACHA_NONCE_SZ]) {
     let session_nonce_bytes = make_chacha_nonce(
         SESSION_CHACHA_NONCE_INFO.as_bytes(),
         session_seed.to_string(),
@@ -33,7 +32,12 @@ pub fn nonce_pair(session_salt: &[u8; SESSION_SALT_SZ], session_seed: &str, stab
     (session_nonce_bytes, stable_nonce_bytes)
 }
 
-pub fn cipher_pair(sender_salt: &[u8], sender_secret: &[u8; SECRET_SZ], receiver_salt: &[u8], receiver_secret: &[u8; SECRET_SZ]) -> (ChaCha20Poly1305,ChaCha20Poly1305) {
+pub fn cipher_pair(
+    sender_salt: &[u8],
+    sender_secret: &[u8; SECRET_SZ],
+    receiver_salt: &[u8],
+    receiver_secret: &[u8; SECRET_SZ],
+) -> (ChaCha20Poly1305, ChaCha20Poly1305) {
     let session_cipher = make_cipher(
         SESSION_CHACHA_KEY_INFO.as_bytes(),
         sender_salt,

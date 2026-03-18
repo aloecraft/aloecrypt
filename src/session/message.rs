@@ -1,46 +1,92 @@
-use crate::kem::{KyberFullKEM, KyberPublicKEM};
-use crate::signatory::{DilithiumSigner, DilithiumVerifier};
+use super::*;
 use crate::consts::*;
 use crate::error::*;
-use crate::session::util::{nonce_pair, cipher_pair, cipher_salt};
-use crate::session::builder::{PartyINTRO, PartyCIPHER, PartyCHALLENGE, PartyRESPONSE, PartySecret, PartyChallenge, FullCIPHER};
+use crate::kem::{KyberFullKEM, KyberPublicKEM};
+use crate::session::builder::{
+    CounterPartyCHALLENGE, CounterPartySECRET, FullCIPHER, PartyCHALLENGE, PartyCIPHER, PartyINTRO,
+    PartyRESPONSE,
+};
+use crate::session::util::{cipher_pair, cipher_salt, nonce_pair};
+use crate::signatory::{DilithiumSigner, DilithiumVerifier};
+use crate::types::*;
 
-use chacha20poly1305::Nonce;
-use chacha20poly1305::aead::{Aead, Payload};
+use crate::option_big_array;
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct MsgHELLO {
-    pub address: [u8; ADDRESS_SZ],
-    pub intro: PartyINTRO
-}
-
-#[derive(Clone)]
-pub struct MsgSYN {
+    pub address: AloecryptAddress,
     pub intro: PartyINTRO,
-    pub cipher: PartyCIPHER
 }
 
-#[derive(Clone)]
-pub struct MsgACK {
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgSYN {
+    pub syn_to: [u8; SESSION_NONCE_SZ],
+    pub syn_address: [u8; ADDRESS_SZ],
+    pub intro: PartyINTRO,
     pub cipher: PartyCIPHER,
-    pub challenge: PartyCHALLENGE
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgACK {
+    pub ack_to: [u8; SESSION_NONCE_SZ],
+    pub ack_address: [u8; ADDRESS_SZ],
+    pub cipher: PartyCIPHER,
+    pub challenge: PartyCHALLENGE,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
 pub struct MsgSYNACK {
+    pub syn_ack: [u8; SESSION_SALT_SZ],
     pub challenge: PartyCHALLENGE,
     pub challenge_response: PartyRESPONSE,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct MsgWELCOME {
     pub challenge_response: PartyRESPONSE,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgGOODBYE {
+    pub address: AloecryptAddress,
+    pub session_salt: [u8; SESSION_SALT_SZ],
+}
+
+pub struct MsgTRANSPORT {
+    // <-- [New Message] i.e. Let's keep this session but rotate ciphers (Expect ACK)
+    pub session_salt: [u8; SESSION_SALT_SZ],
+    pub payload: [u8],
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgRETRY {
+    pub address: AloecryptAddress,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgROTATE {
+    pub session_salt: [u8; SESSION_SALT_SZ],
+    pub syn_to: [u8; SESSION_NONCE_SZ],
+    pub syn_address: [u8; ADDRESS_SZ],
+    pub cipher: PartyCIPHER,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgRESYN {
+    pub address: AloecryptAddress,
+    pub intro: PartyINTRO,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct MsgERROR {
+    // <-- [New Message] i.e. Some error was encountered
+    pub address: AloecryptAddress,
 }
 
 pub fn send_encrypt(
     payload: &[u8],
     sender: FullCIPHER,
-    receiver: PartySecret,
+    receiver: CounterPartySECRET,
     session_salt: &[u8; SESSION_SALT_SZ],
     receiver_nonce: &[u8; SESSION_NONCE_SZ],
     receiver_address: &[u8; ADDRESS_SZ],
@@ -67,7 +113,11 @@ pub fn send_encrypt(
     );
 
     // println!("Send Encrypt:");
+    // println!("receiver_address: {:x?}", receiver_address);
+    // println!("receiver_nonce: {:x?}", receiver_nonce);
     // println!("receiver_salt: {:x?}", receiver_salt);
+    // println!("sender_address: {:x?}", sender_address);
+    // println!("sender_nonce: {:x?}", sender_nonce);
     // println!("sender_salt: {:x?}", sender_salt);
 
     let (session_cipher, stable_cipher) = cipher_pair(
@@ -102,7 +152,7 @@ pub fn send_encrypt(
 
 pub fn recv_decrypt(
     payload: &[u8],
-    sender: PartySecret,
+    sender: CounterPartySECRET,
     receiver: FullCIPHER,
     session_salt: &[u8; SESSION_SALT_SZ],
     receiver_nonce: &[u8; SESSION_NONCE_SZ],
@@ -130,7 +180,11 @@ pub fn recv_decrypt(
     );
 
     // println!("Recv Decrypt:");
+    // println!("receiver_address: {:x?}", receiver_address);
+    // println!("receiver_nonce: {:x?}", receiver_nonce);
     // println!("receiver_salt: {:x?}", receiver_salt);
+    // println!("sender_address: {:x?}", sender_address);
+    // println!("sender_nonce: {:x?}", sender_nonce);
     // println!("sender_salt: {:x?}", sender_salt);
 
     let (session_cipher, stable_cipher) = cipher_pair(

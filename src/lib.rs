@@ -11,24 +11,40 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-pub mod aloecrypt;
 pub mod cli;
-pub mod curve_convert;
-pub mod error;
-pub mod keyfile;
-pub mod keypair;
-pub mod peer_key;
 pub mod consts;
-pub mod traits;
+pub mod crypt;
+pub mod error;
 pub mod kem;
-pub mod time;
-pub mod signatory;
+pub mod macros;
 pub mod session;
+pub mod signatory;
+pub mod time;
+pub mod traits;
+pub mod types;
+pub mod util;
 
-use chacha20poly1305::Key as ChaChaKey;
-use ed25519_dalek::Signature;
+use chacha20poly1305::aead::{Aead, KeyInit, Payload};
+use chacha20poly1305::{ChaCha20Poly1305, Error, Key as ChaChaKey, Nonce};
 use error::AloecryptError;
+use getrandom;
+use hkdf::{Hkdf, HkdfExtract};
+use ml_dsa::signature::{Signer, Verifier};
+use ml_dsa::{KeyGen, KeyPair, MlDsa44, MlDsa65, MlDsa87, Signature, SigningKey, VerifyingKey};
+use ml_kem::{
+    B32, Decapsulate, DecapsulationKey, Encapsulate, EncapsulationKey, ExpandedKeyEncoding,
+    KeyExport, MlKem768, SharedKey, array::Array,
+};
+use pbkdf2::pbkdf2_hmac;
+use rand_chacha::ChaCha20Rng;
+use rand_chacha::rand_core::RngCore as SysRng;
+use rand_chacha::rand_core::{RngCore, SeedableRng};
+use rand_core::TryRng;
+use serde::{Deserialize, Serialize};
+use serde_big_array::BigArray;
+use std::fmt::Write;
 use x25519_dalek::{PublicKey as X25519PublicKey, StaticSecret};
+use zerocopy::IntoBytes;
 
 pub trait KeyPEM {
     fn pem(&self) -> String;
@@ -59,7 +75,41 @@ pub trait PrivKey {
     fn self_encrypt(&self, d: &[u8]) -> Result<Vec<u8>, AloecryptError>;
     fn self_decrypt(&self, d: &[u8]) -> Result<Vec<u8>, AloecryptError>;
     fn derive_chacha_key(&self) -> Result<ChaChaKey, AloecryptError>;
-    fn sign(&self, d: &[u8]) -> Signature;
+    fn sign(&self, d: &[u8]) -> Signature<MlDsa65>;
 }
 
 pub trait PeerKey {}
+
+pub mod option_big_array {
+
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use serde_big_array::BigArray;
+
+    use crate::option_big_array;
+
+    pub fn serialize<S, const N: usize>(val: &Option<[u8; N]>, s: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match val {
+            Some(arr) => s.serialize_some(&serde_bytes::Bytes::new(arr)),
+            None => s.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D, const N: usize>(d: D) -> Result<Option<[u8; N]>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let opt: Option<serde_bytes::ByteBuf> = Option::deserialize(d)?;
+        match opt {
+            None => Ok(None),
+            Some(buf) => {
+                let arr: [u8; N] = buf.into_vec().try_into().map_err(|_| {
+                    serde::de::Error::custom(format!("expected byte array of length {}", N))
+                })?;
+                Ok(Some(arr))
+            }
+        }
+    }
+}

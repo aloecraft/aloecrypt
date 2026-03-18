@@ -2,9 +2,9 @@
 
 <div align="center">
 
-<img src="doc/icon.png" style="height:96px; width:96px;"/>
+<img src="https://raw.githubusercontent.com/aloecraft/aloecrypt/refs/heads/main/doc/icon.png" style="height:96px; width:96px;"/>
 
-**A Fast Secure Format For File Sharing And Encryption At Rest**
+**Post-Quantum Cryptographic Identity, Key Encapsulation, and Secure Sessions**
 
 [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/aloecraft/aloecrypt)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -13,120 +13,173 @@
 
 ## What It Is
 
-Aloecrypt is a binary packaging format and CLI tool for encrypting, signing, and exchanging files between Ed25519 identity holders. A package (`.alo` file) contains three sections:
+Aloecrypt is a Rust library for post-quantum identity management, key encapsulation, and authenticated session establishment. It provides:
 
-- **Header** (176 bytes): magic bytes, recipient address, sender public key, app ID, nonce, and an Ed25519 signature over the encrypted payload
-- **Payload**: the input data, serialized with MessagePack, compressed with LZ4, then encrypted with ChaCha20-Poly1305 using an X25519 shared secret
-- **Footer**: compressed MessagePack metadata (description, timestamps, arbitrary key-value pairs)
-
-Identities are Ed25519 keypairs with a UUIDv7 CID. Private keys are stored in password-protected keyfiles (PBKDF2 + ChaCha20-Poly1305). The format converts Ed25519 keys to X25519 for Diffie-Hellman key exchange, so a single identity handles both signing and encryption.
-
-## Installation
-
-```bash
-cargo install --path .
-```
-
-## Usage
-
-### Generate a keyfile
-
-```bash
-aloecrypt key new -o alice.pem -p mypassword
-aloecrypt key new -o bob.pem -p otherpassword
-```
-
-### Get a public key (for sharing or scripts)
-
-```bash
-aloecrypt key pubkey -k alice.pem
-```
-
-### Encrypt and pack a file
-
-```bash
-BOB_PUB=$(aloecrypt key pubkey -k bob.pem)
-aloecrypt pack secret.json "$BOB_PUB" "MY_APP_ID" -k alice.pem -o package.alo
-```
-
-### Decrypt and verify a package
-
-```bash
-ALICE_PUB=$(aloecrypt key pubkey -k alice.pem)
-aloecrypt unpack package.alo "$ALICE_PUB" -k bob.pem -o decrypted.json
-```
-
-The second positional argument to `unpack` is optional. If provided, the tool rejects the package unless the signer matches. If omitted, it prints the signer's public key to stderr after verification.
-
-### Other key operations
-
-```bash
-aloecrypt key info -k alice.pem          # show CID and public key (requires password)
-aloecrypt key setpw -k alice.pem -o new.pem  # re-encrypt with a new password
-```
+- **ML-DSA-65 (Dilithium) signing** with a hierarchical delegation model — root signers authorize delegate signers with scoped validity
+- **ML-KEM-768 (Kyber) key encapsulation** — both deterministic (canonical) and random KEM generation, signed by the owning identity
+- **A five-message session handshake** (HELLO → SYN → ACK → SYNACK → WELCOME) that establishes a double-KEM shared secret with mutual challenge/response authentication
+- **Double-layer ChaCha20Poly1305 encryption** — each message passes through a session-key cipher then a stable-key cipher, derived independently via HKDF
+- **Password-protected PEM storage** for signers, KEM bundles, and complete sessions (PBKDF2 + ChaCha20Poly1305 with hash-based integrity verification)
+- **Cross-platform support** — builds for native targets and browser WASM (`wasm32-unknown-unknown`)
 
 ## Library Usage
 
-Aloecrypt is also a Rust library. The core types are `Keypair`, `PeerKey`, `Keyfile`, and `AloecryptPackage`.
+### Create an Identity
 
 ```rust
-use aloecrypt::keypair::Keypair;
-use aloecrypt::aloecrypt::AloecryptPackage;
-use aloecrypt::{PrivKey, KeyPEM};
+use aloecrypt::signatory::DilithiumSigner;
+use aloecrypt::traits::*;
+use rand_chacha::ChaCha20Rng;
+use rand_chacha::rand_core::SeedableRng;
 
-let alice = Keypair::new();
-let bob = Keypair::new();
+let mut seed = [0u8; 32];
+getrandom::getrandom(&mut seed);
+let mut rng = ChaCha20Rng::from_seed(seed);
 
-let nonce = [0u8; 16]; // use random in practice
-let app_id = b"[MY_APP_ID_HERE]";
+// Root signer — the long-lived identity
+let root = DilithiumSigner::new(&mut rng);
 
-let package = AloecryptPackage::pack(
-    &"hello world".to_string(),
-    &alice,
-    &bob.public_key,
-    app_id,
-    &nonce,
-).unwrap();
-
-let wire_bytes = package.to_bytes().unwrap();
-
-let reloaded = AloecryptPackage::from_bytes(&wire_bytes).unwrap();
-assert!(reloaded.verify_hdr());
-
-let msg: String = reloaded.unpack(&bob).unwrap();
+// Delegate signer — scoped for a specific purpose
+let delegate = root.create_dilithium_signer(
+    &mut rng,
+    EMPTY_TIMESTAMP, // active_from
+    EMPTY_TIMESTAMP, // expires_at
+    0, 0,            // refresh_count, max_refresh
+);
 ```
 
-## Wire Format
+### Establish a Session
+
+```rust
+use aloecrypt::session::builder::SessionBuilder;
+use aloecrypt::session::message::*;
+use aloecrypt::traits::*;
+
+// Both parties create session builders
+let mut builder_a = SessionBuilder::new(party_b_address, delegate_a, &mut rng);
+let mut builder_b = SessionBuilder::new(party_a_address, delegate_b, &mut rng);
+
+// A → B: HELLO (send intro)
+let hello = MsgHELLO { address: builder_a.address(), intro: builder_a.make_party_intro() };
+builder_b.on_counterparty_intro(&hello.intro, &mut rng)?;
+
+// B → A: SYN (intro + cipher)
+let syn = MsgSYN {
+    syn_to: builder_b.counterparty_intro.unwrap().nonce,
+    syn_address: builder_b.address(),
+    intro: builder_b.make_party_intro(),
+    cipher: builder_b.make_party_cipher()?,
+};
+builder_a.on_counterparty_intro(&syn.intro, &mut rng)?;
+builder_a.on_counterparty_cipher(syn.cipher)?;
+
+// A → B: ACK (cipher + challenge)
+// B → A: SYNACK (challenge + response)
+// A → B: WELCOME (response)
+// ... (see tests/handshake.rs for the complete flow)
+
+let session_a = builder_a.build()?;
+let session_b = builder_b.build()?;
+```
+
+### Encrypt and Decrypt
+
+```rust
+// A → B
+let ciphertext = session_a.encrypt(b"Hello from A!")?;
+let plaintext = session_b.decrypt(&ciphertext)?;
+
+// B → A
+let ciphertext = session_b.encrypt(b"Hello back from B!")?;
+let plaintext = session_a.decrypt(&ciphertext)?;
+```
+
+### Build a Session from Pre-Shared Secrets
+
+For testing or integration with external key agreement, sessions can be constructed directly:
+
+```rust
+use aloecrypt::session::session::AloecryptSession;
+
+let session = AloecryptSession::from_secrets(
+    party_stable_secret, party_session_secret, party_signature,
+    party_nonce, party_address,
+    counter_stable_secret, counter_session_secret, counter_signature,
+    counter_nonce, counter_address,
+    session_salt,
+);
+```
+
+### PEM Export and Import
+
+All private types support password-protected PEM serialization:
+
+```rust
+// Export
+let pem = signer.x_pem(b"password", b"salt", &mut rng);
+
+// Import (full key)
+let loaded = DilithiumSigner::x_loads(&pem, b"password", b"salt")?;
+
+// Import (public portion only — no password needed)
+let verifier = DilithiumSigner::x_pub_loads(&pem)?;
+```
+
+Sessions also round-trip through PEM:
+
+```rust
+let session_pem = session.x_pem(b"password", b"salt", &mut rng);
+let loaded = AloecryptSession::x_loads(&session_pem, b"password", b"salt")?;
+```
+
+## Handshake Protocol
 
 ```
-[Header: 176 bytes][Encrypted Payload: variable][Footer: variable]
-
-Header layout:
-  [0..16]    Magic bytes (ALOECRYPTiammike)
-  [16..48]   Recipient public key (32 bytes)
-  [48..80]   Signer public key (32 bytes)
-  [80..96]   Application ID (16 bytes)
-  [96..112]  Nonce (16 bytes)
-  [112..176] Ed25519 signature (64 bytes)
-
-Footer layout (from end of file):
-  [...-N]    LZ4-compressed MessagePack data
-  [-N..-18]  Footer length (2 bytes, little-endian)
-  [-18..end] Magic bytes (16 bytes)
+Party A                              Party B
+   |                                    |
+   |──── HELLO (intro) ───────────────>│
+   |                                    |
+   │<─── SYN (intro + cipher) ─────────|
+   |                                    |
+   |──── ACK (cipher + challenge) ────>│
+   |                                    |
+   │<─── SYNACK (challenge + response) │
+   |                                    |
+   |──── WELCOME (response) ──────────>│
+   |                                    |
+   |     [ session established ]        |
 ```
+
+Each party contributes a stable KEM and a session KEM. The handshake produces four independent shared secrets (two per KEM, one from each direction) which are combined via HKDF to derive the session encryption keys. Challenge/response nonces verify both parties can correctly encrypt and decrypt before the session is finalized.
+
+## Encryption Architecture
+
+Messages are encrypted through two independent ChaCha20Poly1305 layers:
+
+1. **Session cipher** — keyed from the session KEM shared secret, uses the sender's signature as AAD
+2. **Stable cipher** — keyed from the stable KEM shared secret, wraps the session-encrypted payload with the receiver's signature as AAD
+
+Nonces and cipher keys are derived via HKDF with domain-separated info tags. Cipher salts incorporate the session salt, nonces, and addresses of both parties to ensure uniqueness.
 
 ## Cryptographic Details
 
-| Operation | Algorithm |
+| Component | Algorithm |
 |---|---|
-| Identity keys | Ed25519 (signing) → X25519 (key exchange) |
-| Key exchange | X25519 Diffie-Hellman |
-| Symmetric encryption | ChaCha20-Poly1305 |
-| Key derivation | PBKDF2-HMAC-SHA256 (4096 rounds) |
-| Keyfile encryption | PBKDF2-HMAC-SHA256 + ChaCha20-Poly1305 |
-| Self-encryption | PBKDF2-HMAC-SHA512 + ChaCha20-Poly1305 |
-| Serialization | MessagePack (rmp-serde) |
-| Compression | LZ4 (frame format) |
+| Signatures | ML-DSA-65 (Dilithium) |
+| Key encapsulation | ML-KEM-768 (Kyber) |
+| Symmetric encryption | ChaCha20Poly1305 (double-layered) |
+| Key derivation (session) | HKDF-SHA256 |
+| Key derivation (password) | PBKDF2-HMAC-SHA256 (4096 rounds) |
+| Addressing | HKDF-SHA256 with domain-separated seeds |
+| Hashing | HKDF-SHA256 with domain-separated seeds |
+
+## Cross-Platform
+
+Aloecrypt builds for native targets and `wasm32-unknown-unknown`. Platform-specific handling includes:
+
+- Time: `std::time` on native, `instant` crate on WASM
+- RNG: `getrandom` with `js` feature on WASM
+- UUID: `uuid` with `js` feature on WASM
 
 ## License
 

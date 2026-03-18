@@ -1,6 +1,26 @@
+[env]
+RUST_TEST_THREADS = "1"
+RUST_MIN_STACK = "4194304" # 4 MB! https://github.com/RustCrypto/signatures/pull/1257
+
 [target.wasm32-wasip2]
-rustflags = ["-C", "link-args=-z stack-size=8388608"]  # 8MB
+runner = [
+    "wasmtime", "run",
+    "--wasm","exceptions",
+    "--dir", "./.data/home::.",
+    "--dir", "./.data/tmp::/tmp",
+    "--env", "TMPDIR=/tmp",
+    "--"
+]
+rustflags = [
+    "-C", "link-arg=--stack-first",
+    "-C", "link-arg=-z",
+    "-C", "link-arg=stack-size=4194304",
+    "-C", "link-arg=--initial-memory=8388608"
+]
+
+[target.wasm32-wasip1]
+rustflags = ["-C", "link-args=--stack-first -z stack-size=4194304"]
 
 [target.wasm32-unknown-unknown]
 runner = "wasm-bindgen-test-runner"
-rustflags = ["-C", "link-args=--stack-first -z stack-size=8388608"]
+rustflags = ["-C", "link-args=--stack-first -z stack-size=4194304"]

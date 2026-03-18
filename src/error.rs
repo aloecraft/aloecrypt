@@ -51,7 +51,7 @@ pub enum AloecryptSessionError {
     #[error("Error PartyRESPONSE did not contain a valid challenge response")]
     CounterPartyChallengeMismatch,
     #[error("Error SessionBuilder not ready")]
-    BuildNotReady
+    BuildNotReady,
 }
 
 #[derive(Error, Debug, PartialEq, Eq)]
@@ -79,6 +79,18 @@ pub enum AloecryptError {
 
     #[error("Signature Verification failed")]
     Signature,
+
+    #[error("Password Encryption Failed")]
+    PasswordEncrypt,
+
+    #[error("Password Decryption Failed")]
+    PasswordDecrypt,
+
+    #[error("Private Key Hash Did Not Match Loaded PEM")]
+    LoadPEMPrivKeyHash,
+
+    #[error("Hash Did Not Match Loaded PEM")]
+    LoadPEMHash,
 }
 
 // Manually implement From to bypass the std::error::Error trait bound requirement for the AEAD error
