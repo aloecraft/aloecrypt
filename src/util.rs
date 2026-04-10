@@ -5,7 +5,16 @@ use std::ops::Deref;
 use super::*;
 use crate::consts::*;
 use crate::error::*;
+use crate::time::{SystemTime, UNIX_EPOCH};
 use crate::types::*;
+
+pub fn _ts_bytes_now() -> Timestamp {
+    let ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64;
+    ms.to_le_bytes()
+}
 
 pub fn _address(address_seed: &str, addressing_material: Vec<u8>) -> AloecryptAddress {
     let mut aloecrypt_address = EMPTY_ADDRESS;

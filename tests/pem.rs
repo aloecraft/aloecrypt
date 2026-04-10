@@ -2,14 +2,14 @@
 
 use ml_kem::kem::{Decapsulate, Encapsulate};
 
-use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM};
-use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier};
+use aloecrypt::kem_api::{KyberFullKEM, KyberPublicKEM};
+use aloecrypt::signatory_api::{DilithiumSigner, DilithiumVerifier};
+
+use aloecrypt::message_api::*;
 
 use aloecrypt::consts::*;
-use aloecrypt::traits::{
-    AloecryptDecapsulator, AloecryptEncapsulator, AloecryptPEM, AloecryptPasswordPEM,
-    AloecryptSignable, AloecryptSigner, AloecryptVerifier,
-};
+use aloecrypt::consts_api::*;
+use aloecrypt::traits::*;
 use chacha20poly1305::Nonce;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::Rng as SysRng;
@@ -55,6 +55,18 @@ fn load_and_unload_pem() {
 }
 
 #[crosstest]
+fn load_and_unload_builder_bytes() {
+    let mut builder_a = aloecrypt::builder_api::SessionBuilder::empty();
+    let bytes = builder_a.to_bytes();
+    let mut builder_a_loaded = aloecrypt::builder_api::SessionBuilder::from_bytes(bytes);
+    assert_eq!(
+        builder_a.hash(),
+        builder_a_loaded.hash(),
+        "loaded hash matches original"
+    );
+}
+
+#[crosstest]
 fn load_and_unload_session_pem() {
     let mut seed = [0u8; 32];
     getrandom::getrandom(&mut seed);
@@ -72,9 +84,9 @@ fn load_and_unload_session_pem() {
         root_b.create_dilithium_signer(&mut os_rng, EMPTY_TIMESTAMP, EMPTY_TIMESTAMP, 0, 0);
 
     let mut builder_a =
-        aloecrypt::session::builder::SessionBuilder::new(root_b.address(), delegate_a, &mut os_rng);
+        aloecrypt::builder_api::SessionBuilder::new(root_b.address(), delegate_a, &mut os_rng);
     let mut builder_b =
-        aloecrypt::session::builder::SessionBuilder::new(root_a.address(), delegate_b, &mut os_rng);
+        aloecrypt::builder_api::SessionBuilder::new(root_a.address(), delegate_b, &mut os_rng);
 
     // HELLO → SYN → ACK → SYNACK → WELCOME
     use aloecrypt::session::message::*;
@@ -136,7 +148,7 @@ fn load_and_unload_session_pem() {
     // Round-trip: encrypt session to PEM, load it back, verify messaging still works
     use aloecrypt::traits::AloecryptHashable;
     let session_a_pem = session_a.x_pem(keyfile_password, keyfile_salt, &mut os_rng);
-    let loaded_session_a = aloecrypt::session::session::AloecryptSession::x_loads(
+    let loaded_session_a = aloecrypt::session_api::AloecryptSession::x_loads(
         session_a_pem.as_str(),
         keyfile_password,
         keyfile_salt,
@@ -179,7 +191,7 @@ fn session_pem_wrong_password_fails() {
         buf
     }
 
-    let session = aloecrypt::session::session::AloecryptSession::from_secrets(
+    let session = aloecrypt::session_api::AloecryptSession::from_secrets(
         rand_bytes::<{ aloecrypt::consts::SECRET_SZ }>(),
         rand_bytes::<{ aloecrypt::consts::SECRET_SZ }>(),
         rand_bytes::<{ aloecrypt::consts::SIGNATURE_SZ }>(),
@@ -196,7 +208,7 @@ fn session_pem_wrong_password_fails() {
     let pem = session.x_pem(keyfile_password, keyfile_salt, &mut os_rng);
 
     // Loading with wrong password should fail
-    let result = aloecrypt::session::session::AloecryptSession::x_loads(
+    let result = aloecrypt::session_api::AloecryptSession::x_loads(
         pem.as_str(),
         wrong_password,
         keyfile_salt,
@@ -221,7 +233,7 @@ fn session_pem_pub_loads_extracts_counterparty() {
 
     let address_b: [u8; aloecrypt::consts::ADDRESS_SZ] = rand_bytes();
 
-    let session = aloecrypt::session::session::AloecryptSession::from_secrets(
+    let session = aloecrypt::session_api::AloecryptSession::from_secrets(
         rand_bytes::<{ aloecrypt::consts::SECRET_SZ }>(),
         rand_bytes::<{ aloecrypt::consts::SECRET_SZ }>(),
         rand_bytes::<{ aloecrypt::consts::SIGNATURE_SZ }>(),
@@ -239,7 +251,7 @@ fn session_pem_pub_loads_extracts_counterparty() {
 
     // x_pub_loads should extract the counterparty with zeroed secrets
     let counter_party =
-        aloecrypt::session::session::AloecryptSession::x_pub_loads(pem.as_str()).unwrap();
+        aloecrypt::session_api::AloecryptSession::x_pub_loads(pem.as_str()).unwrap();
     assert_eq!(
         counter_party.address, address_b,
         "CounterParty address should match"

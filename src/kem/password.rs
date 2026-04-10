@@ -1,26 +1,26 @@
-// src/signatory/password.rs
+// src/kem/password.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
+use crate::password::*;
 
-impl AloecryptPasswordLockable<XDilithiumSigner> for DilithiumSigner {
+impl AloecryptPasswordLockable<XKyberFullKEM> for KyberFullKEM {
     fn lock_with_password(
         &self,
         password: &[u8],
         salt: &[u8],
         mut rng: &mut dyn CryptoRngCore,
-    ) -> Result<XDilithiumSigner, AloecryptError> {
+    ) -> Result<XKyberFullKEM, AloecryptError> {
         let mut nonce = EMPTY_CRYPT_NONCE;
         rng.fill_bytes(&mut nonce);
-
-        let x_dlt_privseed_vec =
-            password_encrypt(&self.dlt_privseed, &[0u8], password, salt, &nonce)?;
-        let x_dlt_privseed: XDilithiumPrivSeed = x_dlt_privseed_vec
+        let x_kyb_privkey_vec =
+            password_encrypt(&self.kyb_privkey, &[0u8], password, salt, &nonce)?;
+        let x_kyb_privkey: XKyberPrivkey = x_kyb_privkey_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordEncrypt)?;
-        Ok(XDilithiumSigner {
-            dlt_pubkey: self.dlt_pubkey,
-            x_dlt_privseed,
-            dlt_sig_bytes: self.dlt_sig_bytes,
+        Ok(XKyberFullKEM {
+            kyb_pubkey: self.kyb_pubkey,
+            x_kyb_privkey,
+            kyb_sig_bytes: self.kyb_sig_bytes,
             dlt_root_pubkey: self.dlt_root_pubkey,
             dlt_auth_pubkey: self.dlt_auth_pubkey,
             dlt_root_address: self.dlt_root_address,
@@ -28,7 +28,7 @@ impl AloecryptPasswordLockable<XDilithiumSigner> for DilithiumSigner {
             dlt_created_at: self.dlt_created_at,
             dlt_active_from: self.dlt_active_from,
             dlt_expires_at: self.dlt_expires_at,
-            dlt_priv_hash: self.dlt_privkey.hash(),
+            kyb_priv_hash: self.kyb_privkey.hash(),
             dlt_refresh_count: self.dlt_refresh_count,
             dlt_max_refresh: self.dlt_max_refresh,
             dlt_generation: self.dlt_generation,
@@ -38,34 +38,30 @@ impl AloecryptPasswordLockable<XDilithiumSigner> for DilithiumSigner {
     }
 
     fn unlock_with_password(
-        x_dlt: XDilithiumSigner,
+        x_kem: XKyberFullKEM,
         password: &[u8],
         salt: &[u8],
     ) -> Result<Self, AloecryptError> {
-        let dlt_privseed_vec =
-            password_decrypt(&x_dlt.x_dlt_privseed, &[0u8], password, salt, &x_dlt.nonce)?;
-        let dlt_privseed: DilithiumPrivSeed = dlt_privseed_vec
+        let nonce = &x_kem.nonce;
+        let kyb_privkey_vec =
+            password_decrypt(&x_kem.x_kyb_privkey, &[0u8], password, salt, nonce)?;
+        let kyb_privkey: KyberPrivkey = kyb_privkey_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordDecrypt)?;
-
-        let keypair = MlDsa65::from_seed((&dlt_privseed).into());
-        let dlt_privkey = keypair.signing_key().to_expanded().into();
-
         Ok(Self {
-            dlt_pubkey: x_dlt.dlt_pubkey,
-            dlt_privkey,
-            dlt_privseed,
-            dlt_root_pubkey: x_dlt.dlt_root_pubkey,
-            dlt_auth_pubkey: x_dlt.dlt_auth_pubkey,
-            dlt_sig_bytes: x_dlt.dlt_sig_bytes,
-            dlt_root_address: x_dlt.dlt_root_address,
-            dlt_auth_address: x_dlt.dlt_auth_address,
-            dlt_created_at: x_dlt.dlt_created_at,
-            dlt_active_from: x_dlt.dlt_active_from,
-            dlt_expires_at: x_dlt.dlt_expires_at,
-            dlt_refresh_count: x_dlt.dlt_refresh_count,
-            dlt_max_refresh: x_dlt.dlt_max_refresh,
-            dlt_generation: x_dlt.dlt_generation,
+            kyb_pubkey: x_kem.kyb_pubkey,
+            kyb_privkey,
+            kyb_sig_bytes: x_kem.kyb_sig_bytes,
+            dlt_root_pubkey: x_kem.dlt_root_pubkey,
+            dlt_auth_pubkey: x_kem.dlt_auth_pubkey,
+            dlt_root_address: x_kem.dlt_root_address,
+            dlt_auth_address: x_kem.dlt_auth_address,
+            dlt_created_at: x_kem.dlt_created_at,
+            dlt_active_from: x_kem.dlt_active_from,
+            dlt_expires_at: x_kem.dlt_expires_at,
+            dlt_refresh_count: x_kem.dlt_refresh_count,
+            dlt_max_refresh: x_kem.dlt_max_refresh,
+            dlt_generation: x_kem.dlt_generation,
         })
     }
 }

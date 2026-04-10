@@ -4,10 +4,10 @@ use super::*;
 
 impl AloecryptPEM for XKyberFullKEM {
     fn pem_hdr_tag() -> String {
-        format!("----- BEGIN {} v1 -----", KYBER_FULL_TAG)
+        format!("----- BEGIN {} v1 -----", KYBER_FULL_PEM_TAG)
     }
     fn pem_ftr_tag() -> String {
-        format!("----- END {} v1 -----", KYBER_FULL_TAG)
+        format!("----- END {} v1 -----", KYBER_FULL_PEM_TAG)
     }
     fn pem_sz() -> usize {
         Self::byte_sz()
@@ -45,10 +45,10 @@ impl AloecryptPEM for XKyberFullKEM {
 
 impl AloecryptPEM for KyberPublicKEM {
     fn pem_hdr_tag() -> String {
-        format!("----- BEGIN {} v1 -----", KYBER_PUBLIC_TAG)
+        format!("----- BEGIN {} v1 -----", KYBER_PUBLIC_PEM_TAG)
     }
     fn pem_ftr_tag() -> String {
-        format!("----- END {} v1 -----", KYBER_PUBLIC_TAG)
+        format!("----- END {} v1 -----", KYBER_PUBLIC_PEM_TAG)
     }
     fn pem_sz() -> usize {
         Self::byte_sz()

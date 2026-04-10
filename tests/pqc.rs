@@ -1,20 +1,15 @@
 // tests/pqc.rs
 
-use aloecrypt::error::AloecryptError;
 use ml_kem::kem::{Decapsulate, Encapsulate};
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::RngCore as SysRng;
 use rand_chacha::rand_core::SeedableRng;
 
 use aloecrypt::consts::*;
-use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM};
-use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier};
-use aloecrypt::traits::AloecryptAddressable;
-
-use aloecrypt::traits::{
-    AloecryptDecapsulator, AloecryptEncapsulator, AloecryptSignable, AloecryptSigner,
-    AloecryptVerifier,
-};
+use aloecrypt::error::AloecryptError;
+use aloecrypt::kem_api::{KyberFullKEM, KyberPublicKEM};
+use aloecrypt::signatory_api::{DilithiumSigner, DilithiumVerifier};
+use aloecrypt::traits::*;
 
 mod common;
 use common::common::test as crosstest;
@@ -104,7 +99,14 @@ fn sign_and_verify() {
     );
 
     assert!(!derivative_signer.is_root());
-    assert_eq!(derivative_signer.address(), dilithium_root_signer.address());
+    assert_eq!(
+        derivative_signer.auth_address(),
+        dilithium_root_signer.address()
+    );
+    assert_eq!(
+        derivative_signer.root_address(),
+        dilithium_root_signer.address()
+    );
     assert_eq!(
         derivative_signer.signed_by(),
         dilithium_root_signer.address()
@@ -165,12 +167,8 @@ fn encapsultate_and_decapsulate_secret() {
     );
     let kyber_public_kem_b: KyberPublicKEM = kyber_full_kem_b.into();
 
-    let (cipher_text, sent_shared_key) = kyber_public_kem_b
-        .encapsulation_key()
-        .encapsulate_with_rng(&mut os_rng);
-    let recv_shared_key = kyber_full_kem_b
-        .decapsulation_key()
-        .decapsulate(&cipher_text);
+    let (cipher_text, sent_shared_key) = kyber_public_kem_b.encapsulate(&mut os_rng);
+    let recv_shared_key = kyber_full_kem_b.decapsulate(cipher_text);
 
     assert_eq!(sent_shared_key, recv_shared_key);
 }
@@ -209,12 +207,9 @@ fn encapsultate_and_decapsulate() {
 
     let kyber_public_kem_b: KyberPublicKEM = kyber_full_kem_b.into();
 
-    let (cipher_text, sent_shared_key) = kyber_public_kem_b
-        .encapsulation_key()
-        .encapsulate_with_rng(&mut os_rng);
-    let recv_shared_key = kyber_full_kem_b
-        .decapsulation_key()
-        .decapsulate(&cipher_text);
+    let (cipher_text, sent_shared_key) = kyber_public_kem_b.encapsulate(&mut os_rng);
+
+    let recv_shared_key = kyber_full_kem_b.decapsulate(cipher_text);
 
     assert_eq!(sent_shared_key, recv_shared_key);
 }

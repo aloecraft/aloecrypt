@@ -1,18 +1,16 @@
 // src/bin/generate.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
-use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM, XKyberFullKEM};
-use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier, XDilithiumSigner};
-
-use aloecrypt::session::builder::FromSecretsInput;
-use aloecrypt::session::builder::{
-    CounterPartyCHALLENGE, CounterPartySECRET, FullCIPHER, PartyCHALLENGE, PartyCIPHER, PartyINTRO,
-    PartyRESPONSE, SessionBuilder,
+use aloecrypt::builder_api::{
+    CounterPartyCHALLENGE, CounterPartySECRET, FromSecretsInput, FullCIPHER, PartyCHALLENGE,
+    PartyCIPHER, PartyINTRO, PartyRESPONSE, SessionBuilder,
 };
-use aloecrypt::session::message::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
-use aloecrypt::session::message::{MsgGOODBYE, MsgRESYN, MsgRETRY};
-use aloecrypt::session::party::{XCounterParty, XParty};
-use aloecrypt::session::session::XAloecryptSession;
-use aloecrypt::session::{AloecryptSession, CounterParty, Party};
+use aloecrypt::kem_api::{KyberFullKEM, KyberPublicKEM, XKyberFullKEM};
+use aloecrypt::message_api::{
+    MsgACK, MsgGOODBYE, MsgHELLO, MsgRESYN, MsgRETRY, MsgSYN, MsgSYNACK, MsgWELCOME,
+};
+use aloecrypt::party_api::{CounterParty, Party, XCounterParty, XParty};
+use aloecrypt::session_api::{AloecryptSession, XAloecryptSession};
+use aloecrypt::signatory_api::{DilithiumSigner, DilithiumVerifier, XDilithiumSigner};
 
 use aloecrypt::traits::AloecryptEmpty;
 use regex::Regex;

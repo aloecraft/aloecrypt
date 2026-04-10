@@ -1,173 +1,22 @@
 // src/traits.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
+#![allow(non_camel_case_types)]
 use super::*;
 use crate::consts::*;
 use crate::error::*;
 use crate::session::builder::*;
 use crate::session::message::*;
-use crate::session::party::*;
 use crate::session::session::*;
 use crate::session::*;
-use crate::signatory::DilithiumSignature;
 use crate::types::*;
 
-// Serializable Traits
-// ==================
-pub trait AloecryptEmpty {
-    fn empty() -> Self;
-    fn byte_sz() -> usize;
-    fn to_bytes(&self) -> Vec<u8>;
-    fn from_bytes(bytes: Vec<u8>) -> Self;
-}
+use ml_kem::{
+    B32, Decapsulate, DecapsulationKey, Encapsulate, EncapsulationKey, ExpandedKeyEncoding,
+    KeyExport, MlKem768, SharedKey, array::Array,
+};
+use ml_dsa::signature::{Signer, Verifier, Keypair};
+use ml_dsa::{ExpandedSigningKey, ExpandedSigningKeyBytes, KeyGen, MlDsa44, MlDsa65, MlDsa87, Signature, SigningKey, VerifyingKey};
 
-// PEM File Traits
-// ==================
-pub trait AloecryptPEM {
-    fn pem_hdr_tag() -> String;
-    fn pem_ftr_tag() -> String;
-    fn pem_sz() -> usize;
-    fn pem(&self) -> String;
-    fn loads(pem: &str) -> Result<Self, AloecryptError>
-    where
-        Self: Sized;
-}
-
-pub trait AloecryptPasswordLockable<X_TYP> {
-    fn lock_with_password(
-        &self,
-        password: &[u8],
-        salt: &[u8],
-        os_rng: &mut dyn SysRng,
-    ) -> Result<X_TYP, AloecryptError>;
-    fn unlock_with_password(
-        x_obj: X_TYP,
-        password: &[u8],
-        salt: &[u8],
-    ) -> Result<Self, AloecryptError>
-    where
-        Self: Sized;
-}
-
-pub trait AloecryptPasswordPEM<PUB_TYP> {
-    fn pem_hdr_tag() -> String;
-    fn pem_ftr_tag() -> String;
-    fn pem_sz() -> usize;
-    fn x_pem(&self, password: &[u8], salt: &[u8], os_rng: &mut impl SysRng) -> String;
-    fn x_loads(pem: &str, password: &[u8], salt: &[u8]) -> Result<Self, AloecryptError>
-    where
-        Self: Sized;
-
-    fn x_pub_loads(pem: &str) -> Result<PUB_TYP, AloecryptError>
-    where
-        Self: Sized;
-}
-
-// Cipher Traits
-// ==================
-pub trait AloecryptEncapsulator {
-    fn encapsulation_key(&self) -> EncapsulationKey<MlKem768>;
-}
-
-pub trait AloecryptDecapsulator {
-    fn decapsulation_key(&self) -> DecapsulationKey<MlKem768>;
-}
-
-// Signatory Traits
-// ==================
-pub trait AloecryptVerifier {
-    fn may_verify(&self) -> bool;
-    fn verifying_key(&self) -> VerifyingKey<MlDsa65>;
-    fn verify(
-        &self,
-        signing_material: Vec<u8>,
-        sig_bytes: DilithiumSignature,
-    ) -> Result<(), AloecryptError> {
-        let signature =
-            Signature::<MlDsa65>::decode(&sig_bytes.into()).expect("Error decoding signature!");
-        self.verifying_key()
-            .verify(&(*signing_material), &signature)
-            .map_err(|e| AloecryptError::Signature)
-    }
-}
-
-pub trait AloecryptSigner {
-    fn may_sign(&self) -> bool;
-    fn signing_key(&self) -> SigningKey<MlDsa65>;
-    fn sign(&self, signing_material: Vec<u8>) -> DilithiumSignature {
-        self.signing_key()
-            .sign(signing_material.as_slice())
-            .encode()
-            .into()
-    }
-}
-
-pub trait AloecryptSignable {
-    fn signature(&self) -> DilithiumSignature;
-    fn signed_by(&self) -> AloecryptAddress;
-    fn signing_material(&self) -> Vec<u8>;
-}
-
-// Hashing Traits
-// ==================
-pub trait AloecryptHashable {
-    fn hash(&self) -> AloecryptHash;
-    fn hashing_material(&self) -> Vec<u8>;
-}
-
-pub trait AloecryptXHashable {
-    fn hash(&self) -> AloecryptHash;
-    fn x_hash(&self) -> AloecryptHash;
-    fn x_hashing_material(&self) -> Vec<u8>;
-}
-
-pub trait AloecryptHashableKeypair {
-    fn pub_hash(&self) -> AloecryptHash;
-    fn priv_hash(&self) -> AloecryptHash;
-}
-
-pub trait AloecryptHashablePubkey {
-    fn pub_hash(&self) -> AloecryptHash;
-}
-
-// Addressing Traits
-// ==================
-pub trait AloecryptAddressable {
-    fn generation(&self) -> u64;
-    fn address(&self) -> AloecryptAddress;
-    fn root_address(&self) -> AloecryptAddress;
-    fn addressing_material(&self) -> Vec<u8>;
-    fn is_root(&self) -> bool;
-}
-
-// Session Traits
-// ==================
-
-// Session Builder Traits
-// ==================
-pub trait AloecryptSessionBuilder {
-    fn make_party_intro(&self) -> PartyINTRO;
-    fn make_party_challenge(&self) -> Result<PartyCHALLENGE, AloecryptSessionError>;
-    fn make_party_challenge_response(&self) -> Result<PartyRESPONSE, AloecryptSessionError>;
-    fn make_party_cipher(&self) -> Result<PartyCIPHER, AloecryptSessionError>;
-    fn on_counterparty_intro(
-        &mut self,
-        counterparty_intro: &PartyINTRO,
-        os_rng: &mut dyn rand_chacha::rand_core::CryptoRng,
-    ) -> Result<(), AloecryptSessionError>;
-    fn on_counterparty_cipher(
-        &mut self,
-        counterparty_cipher: PartyCIPHER,
-    ) -> Result<(), AloecryptSessionError>;
-    fn on_counterparty_challenge(
-        &mut self,
-        counterparty_challenge: PartyCHALLENGE,
-    ) -> Result<(), AloecryptSessionError>;
-    fn on_counterparty_challenge_response(
-        &mut self,
-        counterparty_challenge_response: PartyRESPONSE,
-    ) -> Result<(), AloecryptSessionError>;
-    fn build(&self) -> Result<AloecryptSession, AloecryptSessionError>;
-}
 
 /*
 #[derive(Clone, Deserialize, Serialize)]

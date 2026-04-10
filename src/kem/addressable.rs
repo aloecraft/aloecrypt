@@ -13,10 +13,16 @@ impl AloecryptAddressable for XKyberFullKEM {
     fn address(&self) -> AloecryptAddress {
         _address(ADDRESS_SEED_DLT_SIGNER, self.addressing_material())
     }
+    fn auth_address(&self) -> AloecryptAddress {
+        _address(ADDRESS_SEED_DLT_SIGNER, self.auth_addressing_material())
+    }
     fn root_address(&self) -> AloecryptAddress {
         self.dlt_root_address
     }
     fn addressing_material(&self) -> Vec<u8> {
+        self.kyb_pubkey.to_vec()
+    }
+    fn auth_addressing_material(&self) -> Vec<u8> {
         self.dlt_auth_pubkey.to_vec()
     }
     // NOTE: ADDRESS_SEED_DLT_SIGNER + dlt_pubkey b/c address is always tied to delegate signer
@@ -32,10 +38,16 @@ impl AloecryptAddressable for KyberFullKEM {
     fn address(&self) -> AloecryptAddress {
         _address(ADDRESS_SEED_DLT_SIGNER, self.addressing_material())
     }
+    fn auth_address(&self) -> AloecryptAddress {
+        _address(ADDRESS_SEED_DLT_SIGNER, self.auth_addressing_material())
+    }
     fn root_address(&self) -> AloecryptAddress {
         self.dlt_root_address
     }
     fn addressing_material(&self) -> Vec<u8> {
+        self.kyb_pubkey.to_vec()
+    }
+    fn auth_addressing_material(&self) -> Vec<u8> {
         self.dlt_auth_pubkey.to_vec()
     }
     // NOTE: ADDRESS_SEED_DLT_SIGNER + dlt_pubkey b/c address is always tied to delegate signer
@@ -51,10 +63,16 @@ impl AloecryptAddressable for KyberPublicKEM {
     fn address(&self) -> AloecryptAddress {
         _address(ADDRESS_SEED_DLT_SIGNER, self.addressing_material())
     }
+    fn auth_address(&self) -> AloecryptAddress {
+        _address(ADDRESS_SEED_DLT_SIGNER, self.auth_addressing_material())
+    }
     fn root_address(&self) -> AloecryptAddress {
         self.dlt_root_address
     }
     fn addressing_material(&self) -> Vec<u8> {
+        self.kyb_pubkey.to_vec()
+    }
+    fn auth_addressing_material(&self) -> Vec<u8> {
         self.dlt_auth_pubkey.to_vec()
     }
     // NOTE: ADDRESS_SEED_DLT_SIGNER + dlt_pubkey b/c address is always tied to delegate signer

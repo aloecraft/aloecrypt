@@ -1,7 +1,7 @@
 // src/signatory/password_pem.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
-use crate::crypt::*;
+use crate::password::*;
 
 impl AloecryptPasswordPEM<DilithiumVerifier> for DilithiumSigner {
     fn pem_hdr_tag() -> String {
@@ -13,9 +13,9 @@ impl AloecryptPasswordPEM<DilithiumVerifier> for DilithiumSigner {
     fn pem_sz() -> usize {
         panic!("Should use XDilithiumSigner PEM ")
     }
-    fn x_pem(&self, password: &[u8], salt: &[u8], mut os_rng: &mut impl RngCore) -> String {
+    fn x_pem(&self, password: &[u8], salt: &[u8], mut rng: &mut dyn CryptoRngCore) -> String {
         let x_self = self
-            .lock_with_password(&password, &salt, &mut os_rng)
+            .lock_with_password(&password, &salt, &mut rng)
             .expect("lock_with_password failed during PEM export");
         x_self.pem()
     }
@@ -43,7 +43,7 @@ impl AloecryptPasswordPEM<DilithiumVerifier> for DilithiumSigner {
         Self: Sized,
     {
         let x_dlt = XDilithiumSigner::loads(pem)?;
-        Ok(x_dlt.read_public())
+        Ok(x_dlt.into())
     }
 }
 // Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>

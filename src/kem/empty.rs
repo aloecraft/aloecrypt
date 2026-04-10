@@ -4,8 +4,6 @@ use super::*;
 use crate::consts::*;
 use crate::kem::KyberFullKEM;
 use crate::kem::KyberPublicKEM;
-use crate::signatory::DilithiumSigner;
-use crate::signatory::DilithiumVerifier;
 use crate::traits::*;
 use crate::types::*;
 

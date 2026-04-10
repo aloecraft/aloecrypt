@@ -20,7 +20,7 @@ clean:
 	rm -rf target .data
 
 _init:
-	@mkdir -p .data/home .data/tmp
+	@jq -r '.TECHNO_INIT_DIRS[] | "mkdir -p \(.)"' .technoproj | sh
 
 define cargo_targets  # $(1)=command, $(2)=extra flags
 $(1)_native:

@@ -8,6 +8,7 @@
   "TECHNO_INIT_DIRS": [
     ".nogit",
     ".dump",
+    ".generated",
     "config",
     "script"
   ],

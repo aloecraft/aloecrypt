@@ -2,10 +2,6 @@
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
 use crate::consts::*;
-use crate::kem::KyberFullKEM;
-use crate::kem::KyberPublicKEM;
-use crate::signatory::DilithiumSigner;
-use crate::signatory::DilithiumVerifier;
 use crate::traits::*;
 use crate::types::*;
 
@@ -18,7 +14,7 @@ use crate::impl_empty_to_bytes;
 impl AloecryptEmpty for XDilithiumSigner {
     impl_empty_obj!(XDilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
-        x_dlt_privkey:     [u8][ENCRYPTED_SIGN_KEY_SZ],
+        x_dlt_privseed:     [u8][ENCRYPTED_SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],
@@ -36,7 +32,7 @@ impl AloecryptEmpty for XDilithiumSigner {
     );
     impl_empty_to_bytes!(XDilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
-        x_dlt_privkey:     [u8][ENCRYPTED_SIGN_KEY_SZ],
+        x_dlt_privseed:    [u8][ENCRYPTED_SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],
@@ -54,7 +50,7 @@ impl AloecryptEmpty for XDilithiumSigner {
     );
     impl_empty_from_bytes!(XDilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
-        x_dlt_privkey:     [u8][ENCRYPTED_SIGN_KEY_SZ],
+        x_dlt_privseed:     [u8][ENCRYPTED_SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],
@@ -76,6 +72,7 @@ impl AloecryptEmpty for DilithiumSigner {
     impl_empty_obj!(DilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
         dlt_privkey:       [u8][SIGN_KEY_SZ],
+        dlt_privseed:     [u8][SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],
@@ -91,6 +88,7 @@ impl AloecryptEmpty for DilithiumSigner {
     impl_empty_to_bytes!(DilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
         dlt_privkey:       [u8][SIGN_KEY_SZ],
+        dlt_privseed:     [u8][SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],
@@ -106,6 +104,7 @@ impl AloecryptEmpty for DilithiumSigner {
     impl_empty_from_bytes!(DilithiumSigner;
         dlt_pubkey:        [u8][VERIFY_KEY_SZ],
         dlt_privkey:       [u8][SIGN_KEY_SZ],
+        dlt_privseed:     [u8][SIGN_SEED_SZ],
         dlt_root_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_auth_pubkey:   [u8][VERIFY_KEY_SZ],
         dlt_sig_bytes:     [u8][SIGNATURE_SZ],

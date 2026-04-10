@@ -9,19 +9,17 @@ mod harness {
     pub const STACK_SIZE: usize = 32 * 1024 * 1024; // 32 MB
 }
 
+use aloecrypt::builder_api::SessionBuilder;
 use aloecrypt::consts::*;
 use aloecrypt::error::AloecryptSessionError;
-use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM};
-use aloecrypt::session::builder::SessionBuilder;
-use aloecrypt::session::message::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
-use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier};
+use aloecrypt::kem_api::{KyberFullKEM, KyberPublicKEM};
+use aloecrypt::message_api::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
+use aloecrypt::party_api::*;
+use aloecrypt::signatory_api::{DilithiumSigner, DilithiumVerifier};
 use aloecrypt::traits::*;
-use aloecrypt::traits::{
-    AloecryptDecapsulator, AloecryptEncapsulator, AloecryptPEM, AloecryptPasswordPEM,
-    AloecryptSignable, AloecryptSigner, AloecryptVerifier,
-};
-use rand_chacha::ChaCha20Rng;
+use aloecrypt::types::DilithiumSignature;
 
+use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::Rng as SysRng;
 use rand_chacha::rand_core::SeedableRng;
 
@@ -154,38 +152,64 @@ fn test_1() {
     println!("START test_full_handshake_and_bidirectional_messaging");
     // fn test_full_handshake_and_bidirectional_messaging() {
     println!("[00 !!!!]");
-    print_stack_remaining();
-    println!("[A !!!!]");
+    // print_stack_remaining();
+    // println!("[A !!!!]");
     let mut party_a = TestParty::new();
-    println!("[B !!!!]");
+    // println!("[B !!!!]");
     let mut party_b = TestParty::new();
-    println!("[C !!!!]");
-    print_stack_remaining();
+    // println!("[C !!!!]");
+    // print_stack_remaining();
+
+    println!("TestParty size: {}", std::mem::size_of::<TestParty>());
+    println!(
+        "DilithiumSigner size: {}",
+        std::mem::size_of::<DilithiumSigner>()
+    );
+    println!(
+        "DilithiumVerifier size: {}",
+        std::mem::size_of::<DilithiumVerifier>()
+    );
+    println!("KyberFullKEM size: {}", std::mem::size_of::<KyberFullKEM>());
+    println!(
+        "KyberPublicKEM size: {}",
+        std::mem::size_of::<KyberPublicKEM>()
+    );
+    println!(
+        "DilithiumSignature size: {}",
+        std::mem::size_of::<DilithiumSignature>()
+    );
+    println!("Party size: {}", std::mem::size_of::<Party>());
+    println!("CounterParty size: {}", std::mem::size_of::<CounterParty>());
+    println!(
+        "SessionBuilder size: {}",
+        std::mem::size_of::<SessionBuilder>()
+    );
+
     party_a.start_session(party_b.address());
     party_b.start_session(party_a.address());
 
-    // let (mut session_a, mut session_b) = match (party_a.secure_session, party_b.secure_session) {
-    //     (Some(a), Some(b)) => (a, b),
-    //     _ => panic!("Sessions should be initialised"),
-    // };
+    let (mut session_a, mut session_b) = match (party_a.secure_session, party_b.secure_session) {
+        (Some(a), Some(b)) => (a, b),
+        _ => panic!("Sessions should be initialised"),
+    };
 
-    // perform_handshake(&mut session_a, &mut session_b)
-    //     .expect("Handshake should complete without error");
+    perform_handshake(&mut session_a, &mut session_b)
+        .expect("Handshake should complete without error");
 
-    // let built_a = session_a.build().expect("Session A should build");
-    // let built_b = session_b.build().expect("Session B should build");
+    let built_a = session_a.build().expect("Session A should build");
+    let built_b = session_b.build().expect("Session B should build");
 
-    // // A → B
-    // let plaintext_a = b"Hello from Party A!";
-    // let encrypted_a = built_a.encrypt(plaintext_a).expect("A encrypt failed");
-    // let decrypted_a = built_b.decrypt(&encrypted_a).expect("B decrypt failed");
-    // assert_eq!(decrypted_a, plaintext_a, "A→B message mismatch");
+    // A → B
+    let plaintext_a = b"Hello from Party A!";
+    let encrypted_a = built_a.encrypt(plaintext_a).expect("A encrypt failed");
+    let decrypted_a = built_b.decrypt(&encrypted_a).expect("B decrypt failed");
+    assert_eq!(decrypted_a, plaintext_a, "A→B message mismatch");
 
-    // // B → A
-    // let plaintext_b = b"Hello back from Party B!";
-    // let encrypted_b = built_b.encrypt(plaintext_b).expect("B encrypt failed");
-    // let decrypted_b = built_a.decrypt(&encrypted_b).expect("A decrypt failed");
-    // assert_eq!(decrypted_b, plaintext_b, "B→A message mismatch");
+    // B → A
+    let plaintext_b = b"Hello back from Party B!";
+    let encrypted_b = built_b.encrypt(plaintext_b).expect("B encrypt failed");
+    let decrypted_b = built_a.decrypt(&encrypted_b).expect("A decrypt failed");
+    assert_eq!(decrypted_b, plaintext_b, "B→A message mismatch");
 
     println!("END test_full_handshake_and_bidirectional_messaging");
 }
@@ -362,7 +386,7 @@ fn _impl_test_wrong_challenge_response_is_rejected() {
     getrandom::getrandom(&mut seed);
     let mut os_rng = ChaCha20Rng::from_seed(seed);
 
-    use aloecrypt::session::builder::PartyRESPONSE;
+    use aloecrypt::builder_api::PartyRESPONSE;
     let mut party_a = TestParty::new();
     let mut party_b = TestParty::new();
 

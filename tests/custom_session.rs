@@ -4,8 +4,8 @@
 // encryption layer can be used independently of the handshake protocol.
 
 use aloecrypt::consts::*;
-use aloecrypt::session::session::AloecryptSession;
-use aloecrypt::traits::AloecryptAddressable;
+use aloecrypt::session_api::AloecryptSession;
+use aloecrypt::traits::*;
 
 mod common;
 use common::common::test as crosstest;

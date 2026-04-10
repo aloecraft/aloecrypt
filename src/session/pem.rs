@@ -1,10 +1,6 @@
 // src/session/pem.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
-use super::session::*;
 use super::*;
-use crate::error::AloecryptError;
-
-const SESSION_PEM_TAG: &str = crate::consts::SESSION_PEM_TAG;
 
 impl AloecryptPEM for XAloecryptSession {
     fn pem_hdr_tag() -> String {
@@ -92,8 +88,8 @@ macro_rules! impl_msg_pem {
     };
 }
 
-use super::builder::{PartyCHALLENGE, PartyCIPHER, PartyINTRO, PartyRESPONSE};
 use super::message::*;
+use super::{PartyCHALLENGE, PartyCIPHER, PartyINTRO, PartyRESPONSE};
 
 impl_msg_pem!(MsgHELLO, crate::consts::MSG_HELLO_PEM_TAG);
 impl_msg_pem!(MsgSYN, crate::consts::MSG_SYN_PEM_TAG);

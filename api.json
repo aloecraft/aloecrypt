@@ -1,0 +1,1068 @@
+{
+    "models" : [
+        {   
+            "namespace" : "kem_api",
+            "models" : {
+                "KyberFullKEM" : {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields": [
+                        {"name": "kyb_pubkey",        "type" : "KyberPubkey",        "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "kyb_privkey",       "type" : "KyberPrivkey",       "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "kyb_sig_bytes",     "type" : "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_auth_pubkey",   "type" : "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_pubkey",   "type" : "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"} ,
+                        {"name": "dlt_root_address",  "type" : "AloecryptAddress",   "prefix": ""} ,
+                        {"name": "dlt_auth_address",  "type" : "AloecryptAddress",   "prefix": ""} ,
+                        {"name": "dlt_created_at",    "type" : "Timestamp",          "prefix": ""} ,
+                        {"name": "dlt_active_from",   "type" : "Timestamp",          "prefix": ""} ,
+                        {"name": "dlt_expires_at",    "type" : "Timestamp",          "prefix": ""} ,
+                        {"name": "dlt_refresh_count", "type" : "u32",                "prefix": ""} ,
+                        {"name": "dlt_max_refresh",   "type" : "u32",                "prefix": ""} ,
+                        {"name": "dlt_generation",    "type" : "u64",                "prefix": ""}
+                    ]
+                },
+                "KyberPublicKEM": {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "kyb_pubkey",        "type": "KyberPubkey",        "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "kyb_sig_bytes",     "type": "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_auth_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name": "dlt_auth_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name": "dlt_created_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_active_from",   "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_expires_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_refresh_count", "type": "u32",                "prefix": ""},
+                        {"name": "dlt_max_refresh",   "type": "u32",                "prefix": ""},
+                        {"name": "dlt_generation",    "type": "u64",                "prefix": ""}
+                    ]
+                },
+                "XKyberFullKEM": {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"kyb_pubkey",        "type" : "KyberPubkey",        "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name":"x_kyb_privkey",     "type" : "XKyberPrivkey",      "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name":"kyb_sig_bytes",     "type" : "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name":"dlt_auth_pubkey",   "type" : "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name":"dlt_root_pubkey",   "type" : "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name":"dlt_root_address",  "type" : "AloecryptAddress",   "prefix": ""},
+                        {"name":"dlt_auth_address",  "type" : "AloecryptAddress",   "prefix": ""},
+                        {"name":"dlt_created_at",    "type" : "Timestamp",          "prefix": ""},
+                        {"name":"dlt_active_from",   "type" : "Timestamp",          "prefix": ""},
+                        {"name":"dlt_expires_at",    "type" : "Timestamp",          "prefix": ""},
+                        {"name":"kyb_priv_hash",     "type" : "AloecryptHash",      "prefix": ""},
+                        {"name":"dlt_refresh_count", "type" : "u32",                "prefix": ""},
+                        {"name":"dlt_max_refresh",   "type" : "u32",                "prefix": ""},
+                        {"name":"dlt_generation",    "type" : "u64",                "prefix": ""},
+                        {"name":"un_hash",           "type" : "AloecryptHash",      "prefix": ""},
+                        {"name":"nonce",             "type" : "ChachaNonce",        "prefix": ""}
+                    ]
+                }
+            }
+        },
+        {
+            "namespace" : "signatory_api",
+            "models" : {
+                "DilithiumSigner" : {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" :[
+                        {"name" : "dlt_pubkey",        "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "dlt_privkey",       "type": "DilithiumPrivkey",   "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "dlt_sig_bytes",     "type": "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "dlt_auth_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "dlt_root_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "dlt_privseed",      "type": "DilithiumPrivSeed",  "prefix": ""},
+                        {"name" : "dlt_auth_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name" : "dlt_root_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name" : "dlt_generation",    "type": "u64",                "prefix": ""},
+                        {"name" : "dlt_created_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name" : "dlt_active_from",   "type": "Timestamp",          "prefix": ""},
+                        {"name" : "dlt_expires_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name" : "dlt_refresh_count", "type": "u32",                "prefix": ""},
+                        {"name" : "dlt_max_refresh",   "type": "u32",                "prefix": ""}
+                    ]
+                },
+                "DilithiumVerifier" : {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "dlt_pubkey",        "type": "DilithiumPubkey",    "prefix":"        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_sig_bytes",     "type": "DilithiumSignature", "prefix":"        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_auth_pubkey",   "type": "DilithiumPubkey",    "prefix":"        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_pubkey",   "type": "DilithiumPubkey",    "prefix":"        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_address",  "type": "AloecryptAddress",   "prefix":""},
+                        {"name": "dlt_auth_address",  "type": "AloecryptAddress",   "prefix":""},
+                        {"name": "dlt_generation",    "type": "u64",                "prefix":""},
+                        {"name": "dlt_created_at",    "type": "Timestamp",          "prefix":""},
+                        {"name": "dlt_active_from",   "type": "Timestamp",          "prefix":""},
+                        {"name": "dlt_expires_at",    "type": "Timestamp",          "prefix":""},
+                        {"name": "dlt_refresh_count", "type": "u32",                "prefix":""},
+                        {"name": "dlt_max_refresh",   "type": "u32",                "prefix":""}
+                    ]
+                },
+                "XDilithiumSigner" : {
+                    "derives": "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "dlt_pubkey",        "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_sig_bytes",     "type": "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_auth_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_root_pubkey",   "type": "DilithiumPubkey",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "x_dlt_privseed",    "type": "XDilithiumPrivSeed", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "dlt_auth_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name": "dlt_root_address",  "type": "AloecryptAddress",   "prefix": ""},
+                        {"name": "dlt_created_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_active_from",   "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_expires_at",    "type": "Timestamp",          "prefix": ""},
+                        {"name": "dlt_refresh_count", "type": "u32",                "prefix": ""},
+                        {"name": "dlt_max_refresh",   "type": "u32",                "prefix": ""},
+                        {"name": "dlt_generation",    "type": "u64",                "prefix": ""},
+                        {"name": "dlt_priv_hash",     "type": "AloecryptHash",      "prefix": ""},
+                        {"name": "un_hash",           "type": "AloecryptHash",      "prefix": ""},
+                        {"name": "nonce",             "type": "ChachaNonce",        "prefix": ""}
+                    ]
+                }
+            }
+        },
+        {   
+            "namespace" : "party_api",
+            "models" : {
+                "Party": {
+                    "derives": "Clone, Copy, Deserialize, Serialize",
+                    "fields": [
+                        {"name" : "nonce", "type": "AloecryptSessionNonce", "prefix": ""},
+                        {"name" : "session_signature", "type": "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "delegate_signer", "type": "DilithiumSigner", "prefix": ""},
+                        {"name" : "stable_kem", "type": "KyberFullKEM", "prefix": ""},
+                        {"name" : "session_kem", "type": "KyberFullKEM", "prefix": ""},
+                        {"name" : "stable_secret", "type": "AloecryptSecret", "prefix": ""},
+                        {"name" : "session_secret", "type": "AloecryptSecret", "prefix": ""}
+                    ]
+                },
+                "CounterParty" : {
+                    "derives": "Clone, Copy, Deserialize, Serialize",
+                    "fields": [
+                        {"name" : "address",        "type" : "AloecryptAddress",      "prefix": ""},
+                        {"name" : "nonce",          "type" : "AloecryptSessionNonce", "prefix": ""},
+                        {"name" : "signature",      "type" : "DilithiumSignature",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "stable_kem",     "type" : "KyberPublicKEM",        "prefix": ""},
+                        {"name" : "session_kem",    "type" : "KyberPublicKEM",        "prefix": ""},
+                        {"name" : "verifier",       "type" : "DilithiumVerifier",     "prefix": ""},
+                        {"name" : "stable_secret",  "type" : "AloecryptSecret",       "prefix": ""},
+                        {"name" : "session_secret", "type" : "AloecryptSecret",       "prefix": ""}
+                    ]
+                },
+                "XParty": {
+                    "derives": "Clone, Copy, Deserialize, Serialize",
+                    "fields": [
+                        {"name" : "nonce",             "type" : "AloecryptSessionNonce", "prefix" : ""},
+                        {"name" : "session_signature", "type" : "DilithiumSignature",    "prefix" : "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "x_delegate_signer", "type" : "XDilithiumSigner",      "prefix" : ""},
+                        {"name" : "x_stable_kem",      "type" : "XKyberFullKEM",         "prefix" : ""},
+                        {"name" : "x_session_kem",     "type" : "XKyberFullKEM",         "prefix" : ""},
+                        {"name" : "x_stable_secret",   "type" : "XAloecryptSecret",      "prefix" : "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "x_session_secret",  "type" : "XAloecryptSecret",      "prefix" : "        #[serde(with = \"BigArray\")]\n"}
+                    ]
+                },
+                "XCounterParty": {
+                    "derives": "Clone, Copy, Deserialize, Serialize",
+                    "fields": [
+                        {"name": "address",          "type": "AloecryptAddress",      "prefix":  ""},
+                        {"name": "nonce",            "type": "AloecryptSessionNonce", "prefix":  ""},
+                        {"name": "signature",        "type": "DilithiumSignature",    "prefix":  "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "stable_kem",       "type": "KyberPublicKEM",        "prefix":  ""},
+                        {"name": "session_kem",      "type": "KyberPublicKEM",        "prefix":  ""},
+                        {"name": "verifier",         "type": "DilithiumVerifier",     "prefix":  ""},
+                        {"name": "x_stable_secret",  "type": "XAloecryptSecret",      "prefix":  "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "x_session_secret", "type": "XAloecryptSecret",      "prefix":  "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "crypt_nonce",      "type": "ChachaNonce",           "prefix":  ""}
+                    ]
+                }
+            }
+        },
+        {   
+            "namespace" : "session_api",
+            "models" : {
+                "AloecryptSession": {
+                    "derives" : "Clone, Copy, Deserialize, Serialize",
+                    "fields" : [
+                        { "name" : "party",         "type": "Party",                "prefix": ""},
+                        { "name" : "counter_party", "type": "CounterParty",         "prefix": ""},
+                        { "name" : "session_salt",  "type": "AloecryptSessionSalt", "prefix": ""}
+                    ]
+                },
+                "XAloecryptSession": {
+                    "derives" : "Clone, Copy, Deserialize, Serialize",
+                    "fields" : [
+                        { "name" : "x_party",         "type": "XParty",                "prefix": ""},
+                        { "name" : "x_counter_party", "type": "XCounterParty",         "prefix": ""},
+                        { "name" : "x_session_salt",  "type": "XAloecryptSessionSalt", "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        { "name" : "un_hash",         "type": "AloecryptHash",         "prefix": ""},
+                        { "name" : "priv_hash",       "type": "AloecryptHash",         "prefix": ""}
+                    ]
+                }
+            }
+        },
+        {   
+            "namespace" : "message_api",
+            "models" : {
+                "MsgHELLO": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "address", "type": "AloecryptAddress", "prefix":""},
+                        {"name": "intro", "type": "PartyINTRO", "prefix":""}
+                    ]
+                },
+                "MsgSYN": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "syn_to", "type": "AloecryptSessionNonce", "prefix" : ""},
+                        {"name": "syn_address", "type": "AloecryptAddress", "prefix" : ""},
+                        {"name": "intro", "type": "PartyINTRO", "prefix" : ""},
+                        {"name": "cipher", "type": "PartyCIPHER", "prefix" : ""}
+                    ]
+                },
+                "MsgACK": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name" : "ack_to", "type": "AloecryptSessionNonce", "prefix": ""},
+                        {"name" : "ack_address", "type": "AloecryptAddress", "prefix": ""},
+                        {"name" : "cipher", "type": "PartyCIPHER", "prefix": ""},
+                        {"name" : "challenge", "type": "PartyCHALLENGE", "prefix": ""}
+                    ]
+                },
+                "MsgSYNACK": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"syn_ack", "type" : "AloecryptSessionSalt", "prefix":""},
+                        {"name":"challenge", "type" : "PartyCHALLENGE", "prefix":""},
+                        {"name":"challenge_response", "type" : "PartyRESPONSE", "prefix":""}
+                    ]
+                },
+                "MsgWELCOME": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "challenge_response", "type": "PartyRESPONSE", "prefix":""}
+                    ]
+                },
+                "MsgGOODBYE": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "address", "type": "AloecryptAddress", "prefix":""},
+                        {"name": "session_salt", "type": "AloecryptSessionSalt", "prefix":""}
+                    ]
+                },
+                "MsgTRANSPORT": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"session_salt", "type": "AloecryptSessionSalt", "prefix": ""},
+                        {"name":"payload", "type": "Vec<u8>", "prefix": ""}
+                    ]
+                },
+                "MsgRETRY": {
+                    "derives" :  "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"address", "type": "AloecryptAddress", "prefix": ""}
+                    ]
+                },
+                "MsgROTATE": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name" : "session_salt", "type" : "AloecryptSessionSalt", "prefix":""},
+                        {"name" : "syn_to", "type"   : "AloecryptSessionNonce", "prefix":""},
+                        {"name" : "syn_address", "type"  : "AloecryptAddress", "prefix":""},
+                        {"name" : "cipher", "type"   : "PartyCIPHER", "prefix":""}
+                    ]
+                },
+                "MsgRESYN": {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name" : "address", "type" : "AloecryptAddress", "prefix": ""},
+                        {"name" : "intro", "type" : "PartyINTRO", "prefix": ""}
+                    ]
+                },
+                "MsgERROR" : {
+                    "derives" : "Clone, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"address", "type": "AloecryptAddress", "prefix":""}
+                    ]
+                }
+            }
+        },
+        {   
+            "namespace" : "builder_api",
+            "models" : {
+                "PartyINTRO" : {
+                    "derives":"Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"address",     "type": "AloecryptAddress",      "prefix": "" },
+                        {"name":"nonce",       "type": "AloecryptSessionNonce", "prefix": "" },
+                        {"name":"stable_kem",  "type": "KyberPublicKEM",        "prefix": "" },
+                        {"name":"session_kem", "type": "KyberPublicKEM",        "prefix": "" },
+                        {"name":"verifier",    "type": "DilithiumVerifier",     "prefix": "" }
+                    ]
+                },
+                "PartyCIPHER": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "stable_cipher",  "type": "KyberCipher",        "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "session_cipher", "type": "KyberCipher",        "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "signature",      "type": "DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n"}
+                    ]},
+                "FullCIPHER": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "stable_cipher",  "type": "KyberCipher",        "prefix" : "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "session_cipher", "type": "KyberCipher",        "prefix" : "        #[serde(with = \"BigArray\")]\n"},
+                        {"name": "stable_secret",  "type": "AloecryptSecret",    "prefix" : ""  },
+                        {"name": "session_secret", "type": "AloecryptSecret",    "prefix" : ""  },
+                        {"name": "signature",      "type": "DilithiumSignature", "prefix" : "        #[serde(with = \"BigArray\")]\n"}
+                    ]},
+                "CounterPartySECRET": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"stable_secret",  "type":"AloecryptSecret",    "prefix": ""},
+                        {"name":"session_secret", "type":"AloecryptSecret",    "prefix": ""},
+                        {"name":"signature",      "type":"DilithiumSignature", "prefix": "        #[serde(with = \"BigArray\")]\n" }
+                    ]},
+                "PartyCHALLENGE": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"encrypted_challenge", "type": "XAloecryptSessionNonce", "prefix": "        #[serde(with = \"BigArray\")]\n" },
+                        {"name":"encrypted_check",     "type": "XAloecryptSessionNonce", "prefix": "        #[serde(with = \"BigArray\")]\n" }
+                    ]},
+                "PartyRESPONSE": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name": "decrypted_challenge", "type": "AloecryptSessionNonce", "prefix": ""}
+                    ]},
+                "CounterPartyCHALLENGE": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"decrypted_challenge", "type": "AloecryptSessionNonce", "prefix": ""},
+                        {"name":"decrypted_check", "type": "AloecryptSessionNonce", "prefix": ""}
+                    ]},
+                "FromSecretsInput": {
+                    "derives" : "Clone, Copy, Deserialize, Serialize",
+                    "fields" : [
+                        {"name" : "stable_secret_a",  "type": "AloecryptSecret",       "prefix": ""},
+                        {"name" : "session_secret_a", "type": "AloecryptSecret",       "prefix": ""},
+                        {"name" : "signature_a",      "type": "DilithiumSignature",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "nonce_a",          "type": "AloecryptSessionNonce", "prefix": ""},
+                        {"name" : "address_a",        "type": "AloecryptAddress",      "prefix": ""},
+                        {"name" : "stable_secret_b",  "type": "AloecryptSecret",       "prefix": ""},
+                        {"name" : "session_secret_b", "type": "AloecryptSecret",       "prefix": ""},
+                        {"name" : "signature_b",      "type": "DilithiumSignature",    "prefix": "        #[serde(with = \"BigArray\")]\n"},
+                        {"name" : "nonce_b",          "type": "AloecryptSessionNonce", "prefix": ""},
+                        {"name" : "address_b",        "type": "AloecryptAddress",      "prefix": ""},
+                        {"name" : "session_salt",     "type": "AloecryptSessionSalt",  "prefix": ""}
+                    ]
+                },
+                "SessionBuilder": {
+                    "derives" : "Clone, Copy, Debug, Deserialize, Serialize",
+                    "fields" : [
+                        {"name":"delegate_signer", "type":"DilithiumSigner",       "prefix": ""},
+                        {"name":"stable_kem",      "type":"KyberFullKEM",          "prefix": ""},
+                        {"name":"session_kem",     "type":"KyberFullKEM",          "prefix": ""},
+                        {"name":"nonce",           "type":"AloecryptSessionNonce", "prefix": ""},
+                        {"name":"challenge_nonce", "type":"AloecryptSessionNonce", "prefix": ""},
+
+                        {"name":"session_salt",           "type": "AloecryptSessionSalt",  "optional": "true", "prefix": ""},
+                        {"name":"signature",              "type": "DilithiumSignature",    "optional": "true", "prefix": "        #[serde(with = \"option_big_array\")]\n"},
+                        {"name":"cipher",                 "type": "FullCIPHER",            "optional": "true", "prefix": ""},
+                        {"name":"counterparty_intro",     "type": "PartyINTRO",            "optional": "true", "prefix": ""},
+                        {"name":"counterparty_cipher",    "type": "CounterPartySECRET",    "optional": "true", "prefix": ""},
+                        {"name":"counterparty_challenge", "type": "CounterPartyCHALLENGE", "optional": "true", "prefix": ""},
+
+                        {"name":"build_ready", "type": "bool", "prefix": ""}
+                    ]
+                }
+            }
+        }
+    ],
+    "sz_consts" : [
+        {"name" : "PEM_CHUNK_SZ",                 "value" : "32"},
+        {"name" : "HASH_SZ",                      "value" : "32"},
+        {"name" : "ADDRESS_SZ",                   "value" : "32"},
+        {"name" : "VERIFY_KEY_SZ",                "value" : "1952"},
+        {"name" : "SIGN_KEY_SZ",                  "value" : "4032"},
+        {"name" : "SIGN_SEED_SZ",                 "value" : "32"},
+        {"name" : "SIGNATURE_SZ",                 "value" : "3309"},
+        {"name" : "ENCAPSULATE_KEY_SZ",           "value" : "1184"},
+        {"name" : "DECAPSULATE_KEY_SZ",           "value" : "2400"},
+        {"name" : "KYBER_SEED_SZ",                "value" : "64"},
+        {"name" : "CIPHER_SZ",                    "value" : "1088"},
+        {"name" : "SECRET_SZ",                    "value" : "32"},
+        {"name" : "TIMESTAMP_SZ",                 "value" : "8"},
+        {"name" : "CHACHA_NONCE_SZ",              "value" : "12"},
+        {"name" : "CHACHA_KEY_SZ",                "value" : "32"},
+        {"name" : "SESSION_NONCE_SZ",             "value" : "32"},
+        {"name" : "SESSION_SALT_SZ",              "value" : "32"},
+        {"name" : "ENCRYPTED_TAG_SZ",             "value" : "16"},
+        {"name" : "ENCRYPTED_SESSION_SALT_SZ",              "value" : "SESSION_SALT_SZ + ENCRYPTED_TAG_SZ"},
+        
+        {"name" : "ENCRYPTED_SIGN_KEY_SZ",        "value" : "SIGN_KEY_SZ + ENCRYPTED_TAG_SZ"},
+        {"name" : "ENCRYPTED_SIGN_SEED_SZ",       "value" : "SIGN_SEED_SZ + ENCRYPTED_TAG_SZ"},
+        {"name" : "ENCRYPTED_DECAPSULATE_KEY_SZ", "value" : "DECAPSULATE_KEY_SZ + ENCRYPTED_TAG_SZ"},
+        {"name" : "ENCRYPTED_NONCE_SZ",           "value" : "SESSION_NONCE_SZ + 2 * ENCRYPTED_TAG_SZ"}
+    ],
+    "empty_consts" : [
+        {"name": "EMPTY_CRYPT_KEY",                 "size": "CHACHA_KEY_SZ"},
+        {"name": "EMPTY_CRYPT_NONCE",               "size": "CHACHA_NONCE_SZ"},
+        {"name": "EMPTY_VERIFY_KEY",                "size": "VERIFY_KEY_SZ"},
+        {"name": "EMPTY_SIGN_KEY",                  "size": "SIGN_KEY_SZ"},
+        {"name": "EMPTY_SIGN_SEED",                 "size": "SIGN_SEED_SZ"},
+        {"name": "EMPTY_KYBER_SEED",                "size": "KYBER_SEED_SZ"},
+        {"name": "EMPTY_ENCRYPTED_SIGN_KEY",        "size": "ENCRYPTED_SIGN_KEY_SZ"},
+        {"name": "EMPTY_ENCAPSULATE_KEY",           "size": "ENCAPSULATE_KEY_SZ"},
+        {"name": "EMPTY_DECAPSULATE_KEY",           "size": "DECAPSULATE_KEY_SZ"},
+        {"name": "EMPTY_ENCRYPTED_DECAPSULATE_KEY", "size": "ENCRYPTED_DECAPSULATE_KEY_SZ"},
+        {"name": "EMPTY_SESSION_NONCE",             "size": "SESSION_NONCE_SZ"},
+        {"name": "EMPTY_SESSION_SALT",              "size": "SESSION_SALT_SZ"},
+        {"name": "EMPTY_SECRET",                    "size": "SECRET_SZ"},
+        {"name": "EMPTY_SIGNATURE",                 "size": "SIGNATURE_SZ"},
+        {"name": "EMPTY_ADDRESS",                   "size": "ADDRESS_SZ"},
+        {"name": "EMPTY_TIMESTAMP",                 "size": "TIMESTAMP_SZ"},
+        {"name": "EMPTY_CIPHER",                    "size": "CIPHER_SZ"},
+        {"name": "EMPTY_HASH",                      "size": "HASH_SZ"}
+    ],
+    "byte_aliases" : [
+        { "name" : "DilithiumPubkey",             "length": "VERIFY_KEY_SZ"},
+        { "name" : "DilithiumPrivkey",            "length": "SIGN_KEY_SZ"},
+        { "name" : "XDilithiumPrivkey",           "length": "SIGN_KEY_SZ + ENCRYPTED_TAG_SZ"},
+        { "name" : "DilithiumPrivSeed",           "length": "SIGN_SEED_SZ"},
+        { "name" : "XDilithiumPrivSeed",          "length": "SIGN_SEED_SZ + ENCRYPTED_TAG_SZ"},
+        { "name" : "KyberPubkey",                 "length": "ENCAPSULATE_KEY_SZ"},
+        { "name" : "KyberPrivkey",                "length": "DECAPSULATE_KEY_SZ"},
+        { "name" : "XKyberPrivkey",               "length": "ENCRYPTED_DECAPSULATE_KEY_SZ"},
+        { "name" : "KyberSeed",                   "length": "KYBER_SEED_SZ"},
+        { "name" : "AloecryptAddress",            "length": "ADDRESS_SZ"},
+        { "name" : "AloecryptHash",               "length": "HASH_SZ"},
+        { "name" : "AloecryptSecret",             "length": "SECRET_SZ"},
+        { "name" : "XAloecryptSecret",            "length": "SECRET_SZ + ENCRYPTED_TAG_SZ"},
+        { "name" : "AloecryptSessionNonce",       "length": "SESSION_NONCE_SZ"},
+        { "name" : "XAloecryptSessionNonce",      "length": "ENCRYPTED_NONCE_SZ"},
+        { "name" : "AloecryptSessionSalt",        "length": "SESSION_SALT_SZ"},
+        { "name" : "XAloecryptSessionSalt",       "length": "ENCRYPTED_SESSION_SALT_SZ"},
+        { "name" : "Timestamp",                   "length": "TIMESTAMP_SZ"},
+        { "name" : "KyberCipher",                 "length": "CIPHER_SZ"},
+        { "name" : "DilithiumSignature",          "length": "SIGNATURE_SZ"},
+        { "name" : "ChachaNonce",                 "length": "CHACHA_NONCE_SZ"},
+        { "name" : "ChachaKey",                   "length": "CHACHA_KEY_SZ"}
+    ],
+
+    "traits" : [
+        { 
+            "name": "AloecryptEmpty",
+            "generics" : [""],
+            "functions" : [
+                {
+                    "name" : "empty", 
+                    "instance" : "",
+                    "params" : [],
+                    "return" : "Self"
+                },
+                {
+                    "name" : "byte_sz", 
+                    "instance" : "",
+                    "params" : [],
+                    "return" : "usize"
+                },
+                {   
+                    "name" : "to_bytes",
+                    "instance" : "&self",
+                    "params" : [ ],
+
+                    "return" : "Vec<u8>"
+                },
+                {
+                    "name" : "from_bytes",
+                    "instance" : "",
+                    "params" : [
+                        { "name" : "bytes", "type" : "Vec<u8>" }
+                    ],
+                    "return" : "Self"
+                }
+            ]
+        },
+        {
+            "name": "AloecryptPEM",
+            "generics" : [""],
+            "functions" : [
+                { "name" : "pem_hdr_tag", "instance" : "",      "params" : [], "return" : "String" },
+                { "name" : "pem_ftr_tag", "instance" : "",      "params" : [], "return" : "String" },
+                { "name" : "pem_sz",      "instance" : "",      "params" : [], "return" : "usize"  },
+                { "name" : "pem",         "instance" : "&self", "params" : [], "return" : "String" },
+                { "name" : "loads",       "instance" : "",      "params" : [ { "name" : "pem", "type" : "&str" } ], "return" : "Result<Self, AloecryptError>","constraints" : "Self: Sized"
+                }
+            ]
+        },
+        {
+            "name": "AloecryptPasswordLockable",
+            "generics" : ["X_TYP"],
+            "functions" : [
+                { "name" : "lock_with_password", "instance" : "&self", "params" : [ 
+                    {"name":"password", "type":"&[u8]"},
+                    {"name":"salt", "type":"&[u8]"},
+                    {"name":"rng", "type":"&mut dyn CryptoRngCore"}
+                ], "return" : "Result<X_TYP, AloecryptError>" },
+                { 
+                    "name" : "unlock_with_password", 
+                    "instance" : "", 
+                    "params" : [ 
+                        {"name": "x_obj", "type": "X_TYP"},
+                        {"name": "password", "type": "&[u8]"},
+                        {"name": "salt", "type": "&[u8]"}
+                    ], 
+                    "return" : "Result<Self, AloecryptError>",
+                    "constraints" : "Self: Sized"
+                }
+            ]
+        },
+        {
+            "name": "AloecryptPasswordPEM",
+            "generics" : ["PUB_TYP"],
+            "functions" : [
+                { "name" : "pem_hdr_tag", "instance" : "",      "params" : [], "return" : "String" },
+                { "name" : "pem_ftr_tag", "instance" : "",      "params" : [], "return" : "String" },
+                { "name" : "pem_sz",      "instance" : "",      "params" : [], "return" : "usize" },
+                { "name" : "x_pem",       "instance" : "&self", "params" : [ 
+                    {"name":"password", "type": "&[u8]"},
+                    {"name":"salt", "type": "&[u8]"},
+                    {"name":"rng", "type": "&mut dyn CryptoRngCore"} 
+                ], "return" : "String" },
+                { 
+                    "name" : "x_loads",     
+                    "instance" : "",      
+                    "params" : [ 
+                        {"name":"pem", "type": "&str"},
+                        {"name":"password", "type": "&[u8]"},
+                        {"name":"salt", "type": "&[u8]"} 
+                    ], 
+                    "return" : "Result<Self, AloecryptError>",
+                    "constraints" : "Self: Sized" 
+                },
+                { 
+                    "name" : "x_pub_loads", 
+                    "instance" : "",      
+                    "params" : [ 
+                        { "name" : "pem", "type" : "&str" } 
+                    ], 
+                    "return" : "Result<PUB_TYP, AloecryptError>",
+                    "constraints" : "Self: Sized" 
+                }
+            ]
+        },
+        {
+            "name": "AloecryptEncapsulator",
+            "generics": [],
+            "functions": [
+                { "name": "encapsulation_key", "instance": "&self", "params": [], "return": "KyberPubkey" },
+                { "name": "encapsulate", "instance": "&self", "params": [{"name":"rng", "type":"&mut dyn CryptoRngCore"}], "return":"(KyberCipher, AloecryptSecret)" }
+            ]
+        },
+        {
+            "name": "AloecryptDecapsulator",
+            "generics": [],
+            "functions": [
+                { "name": "decapsulation_key", "instance": "&self", "params": [], "return": "KyberPrivkey" },
+                { "name": "decapsulate", "instance": "&self", "params": [{"name":"cipher", "type":"KyberCipher"}], "return": "AloecryptSecret" }
+            ]
+        },
+        {
+            "name": "AloecryptVerifier",
+            "generics": [],
+            "functions": [
+                { "name": "may_verify",    "instance": "&self", "params": [], "return": "bool" },
+                { "name": "verifying_key", "instance": "&self", "params": [], "return": "DilithiumPubkey" },
+                { "name": "verify", "instance": "&self", "params": [
+                    { "name": "signing_material", "type": "Vec<u8>" },
+                    { "name": "sig_bytes",         "type": "DilithiumSignature" }
+                ], "return": "Result<(), AloecryptError>" }
+            ]
+        },
+        {
+            "name": "AloecryptSigner",
+            "generics": [],
+            "functions": [
+                { "name": "may_sign",    "instance": "&self", "params": [], "return": "bool" },
+                { "name": "signing_key", "instance": "&self", "params": [], "return": "DilithiumPrivSeed" },
+                { "name": "sign", "instance": "&self", "params": [
+                    { "name": "signing_material", "type": "Vec<u8>" }
+                ], "return": "DilithiumSignature" }
+            ]
+        },
+        {
+            "name": "AloecryptSignable",
+            "generics": [],
+            "functions": [
+                { "name": "signature",        "instance": "&self", "params": [], "return": "DilithiumSignature" },
+                { "name": "signed_by",        "instance": "&self", "params": [], "return": "AloecryptAddress" },
+                { "name": "signing_material", "instance": "&self", "params": [], "return": "Vec<u8>" }
+            ]
+        },
+        {
+            "name": "AloecryptHashable",
+            "generics": [],
+            "functions": [
+                { "name": "hash",             "instance": "&self", "params": [], "return": "AloecryptHash" },
+                { "name": "hashing_material", "instance": "&self", "params": [], "return": "Vec<u8>" }
+            ]
+        },
+        {
+            "name": "AloecryptXHashable",
+            "generics": [],
+            "functions": [
+                { "name": "hash",               "instance": "&self", "params": [], "return": "AloecryptHash" },
+                { "name": "x_hash",             "instance": "&self", "params": [], "return": "AloecryptHash" },
+                { "name": "x_hashing_material", "instance": "&self", "params": [], "return": "Vec<u8>" }
+            ]
+        },
+        {
+            "name": "AloecryptHashableKeypair",
+            "generics": [],
+            "functions": [
+                { "name": "pub_hash",  "instance": "&self", "params": [], "return": "AloecryptHash" },
+                { "name": "priv_hash", "instance": "&self", "params": [], "return": "AloecryptHash" }
+            ]
+        },
+        {
+            "name": "AloecryptHashablePubkey",
+            "generics": [],
+            "functions": [
+                { "name": "pub_hash", "instance": "&self", "params": [], "return": "AloecryptHash" }
+            ]
+        },
+        {
+            "name": "AloecryptAddressable",
+            "generics": [],
+            "functions": [
+                { "name": "generation",              "instance": "&self", "params": [], "return": "u64" },
+                { "name": "address",                 "instance": "&self", "params": [], "return": "AloecryptAddress" },
+                { "name": "auth_address",            "instance": "&self", "params": [], "return": "AloecryptAddress" },
+                { "name": "root_address",            "instance": "&self", "params": [], "return": "AloecryptAddress" },
+                { "name": "addressing_material",     "instance": "&self", "params": [], "return": "Vec<u8>" },
+                { "name": "auth_addressing_material","instance": "&self", "params": [], "return": "Vec<u8>" },
+                { "name": "is_root",                 "instance": "&self", "params": [], "return": "bool" }
+            ]
+        },
+        {
+            "name": "AloecryptSessionBuilder",
+            "generics": [],
+            "functions": [
+                { "name": "make_party_intro",               "instance": "&self",    "params": [], "return": "PartyINTRO" },
+                { "name": "make_party_challenge",           "instance": "&self",    "params": [], "return": "Result<PartyCHALLENGE, AloecryptSessionError>" },
+                { "name": "make_party_challenge_response",  "instance": "&self",    "params": [], "return": "Result<PartyRESPONSE, AloecryptSessionError>" },
+                { "name": "make_party_cipher",              "instance": "&self",    "params": [], "return": "Result<PartyCIPHER, AloecryptSessionError>" },
+                { "name": "on_counterparty_intro", "instance": "&mut self", "params": [
+                    { "name": "counterparty_intro", "type": "&PartyINTRO" },
+                    { "name": "rng",                "type": "&mut dyn CryptoRngCore" }
+                ], "return": "Result<(), AloecryptSessionError>" },
+                { "name": "on_counterparty_cipher", "instance": "&mut self", "params": [
+                    { "name": "counterparty_cipher", "type": "PartyCIPHER" }
+                ], "return": "Result<(), AloecryptSessionError>" },
+                { "name": "on_counterparty_challenge", "instance": "&mut self", "params": [
+                    { "name": "counterparty_challenge", "type": "PartyCHALLENGE" }
+                ], "return": "Result<(), AloecryptSessionError>" },
+                { "name": "on_counterparty_challenge_response", "instance": "&mut self", "params": [
+                    { "name": "counterparty_challenge_response", "type": "PartyRESPONSE" }
+                ], "return": "Result<(), AloecryptSessionError>" },
+                { "name": "build", "instance": "&self", "params": [], "return": "Result<AloecryptSession, AloecryptSessionError>" }
+            ]
+        },
+        {
+            "name": "IDilithiumSigner",
+            "generics": [],
+            "functions": [
+                {
+                    "name": "new",
+                    "instance": "",
+                    "params": [
+                        { "name": "rng", "type": "&mut dyn CryptoRngCore" }
+                    ],
+                    "return": "Self",
+                    "constraints": "Self: Sized"
+                },
+                {
+                    "name": "canonical_dilithium_signer",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "cannonical_idx",    "type": "&[u8]" },
+                        { "name": "dlt_active_from",   "type": "Timestamp" },
+                        { "name": "dlt_expires_at",    "type": "Timestamp" },
+                        { "name": "dlt_refresh_count", "type": "u32" },
+                        { "name": "dlt_max_refresh",   "type": "u32" }
+                    ],
+                    "return": "DilithiumSigner"
+                },
+                {
+                    "name": "create_dilithium_signer",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "rng",               "type": "&mut dyn CryptoRngCore" },
+                        { "name": "dlt_active_from",   "type": "Timestamp" },
+                        { "name": "dlt_expires_at",    "type": "Timestamp" },
+                        { "name": "dlt_refresh_count", "type": "u32" },
+                        { "name": "dlt_max_refresh",   "type": "u32" }
+                    ],
+                    "return": "Self",
+                    "constraints": "Self: Sized"
+                },
+                {
+                    "name": "canonical_kyber_kem",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "cannonical_idx",    "type": "&[u8]" },
+                        { "name": "dlt_active_from",   "type": "Timestamp" },
+                        { "name": "dlt_expires_at",    "type": "Timestamp" },
+                        { "name": "dlt_refresh_count", "type": "u32" },
+                        { "name": "dlt_max_refresh",   "type": "u32" }
+                    ],
+                    "return": "KyberFullKEM"
+                },
+                {
+                    "name": "create_kyber_kem",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "rng",               "type": "&mut dyn CryptoRngCore" },
+                        { "name": "dlt_active_from",   "type": "Timestamp" },
+                        { "name": "dlt_expires_at",    "type": "Timestamp" },
+                        { "name": "dlt_refresh_count", "type": "u32" },
+                        { "name": "dlt_max_refresh",   "type": "u32" }
+                    ],
+                    "return": "KyberFullKEM"
+                }
+            ]
+        },
+        {
+            "name": "ISessionBuilder",
+            "generics": [],
+            "functions": [
+                {
+                    "name": "new",
+                    "instance": "",
+                    "params": [
+                        { "name": "counterparty_address", "type": "AloecryptAddress" },
+                        { "name": "delegate_signer",      "type": "DilithiumSigner" },
+                        { "name": "rng",                  "type": "&mut dyn CryptoRngCore" }
+                    ],
+                    "return": "Self",
+                    "constraints": "Self: Sized"
+                }
+            ]
+        },
+        {
+            "name": "IPartyINTRO",
+            "generics": [],
+            "functions": [
+                {
+                    "name": "make_salt",
+                    "instance": "",
+                    "params": [
+                        { "name": "party_a", "type": "&PartyINTRO" },
+                        { "name": "party_b", "type": "&PartyINTRO" }
+                    ],
+                    "return": "AloecryptSessionSalt"
+                },
+                {
+                    "name": "make_cipher",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "signature", "type": "DilithiumSignature" },
+                        { "name": "rng",       "type": "&mut dyn CryptoRngCore" }
+                    ],
+                    "return": "Result<FullCIPHER, AloecryptSessionError>"
+                }
+            ]
+        },
+        {
+            "name": "IAloecryptSession",
+            "generics": [],
+            "functions": [
+                {
+                    "name": "encrypt",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "plaintext", "type": "&[u8]" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptSessionError>"
+                },
+                {
+                    "name": "decrypt",
+                    "instance": "&self",
+                    "params": [
+                        { "name": "ciphertext", "type": "&[u8]" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptSessionError>"
+                },
+                {
+                    "name": "from_secrets",
+                    "instance": "",
+                    "params": [
+                        { "name": "party_stable_secret",        "type": "AloecryptSecret" },
+                        { "name": "party_session_secret",       "type": "AloecryptSecret" },
+                        { "name": "party_session_signature",    "type": "DilithiumSignature" },
+                        { "name": "party_nonce",                "type": "AloecryptSessionNonce" },
+                        { "name": "party_address",              "type": "AloecryptAddress" },
+                        { "name": "counterparty_stable_secret", "type": "AloecryptSecret" },
+                        { "name": "counterparty_session_secret","type": "AloecryptSecret" },
+                        { "name": "counterparty_signature",     "type": "DilithiumSignature" },
+                        { "name": "counterparty_nonce",         "type": "AloecryptSessionNonce" },
+                        { "name": "counterparty_address",       "type": "AloecryptAddress" },
+                        { "name": "session_salt",               "type": "AloecryptSessionSalt" }
+                    ],
+                    "return": "Self",
+                    "constraints": "Self: Sized"
+                }
+            ]
+        }
+    ],
+    "impls": [
+        {"trait": "Into", "generics" : ["KyberPublicKEM"],     "struct": "KyberFullKEM"},
+        {"trait": "Into", "generics" : ["KyberPublicKEM"],     "struct" :"XKyberFullKEM"},
+        {"trait": "From", "generics" : ["DilithiumSigner"],    "struct" :"DilithiumVerifier"},
+        {"trait": "From", "generics" : ["XDilithiumSigner"],   "struct" :"DilithiumVerifier"},
+        {"trait": "AloecryptAddressable",     "generics": [],  "struct": "XKyberFullKEM"},
+        {"trait": "AloecryptAddressable",     "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptAddressable",     "generics": [],  "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptDecapsulator",    "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptEmpty",           "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptEmpty",           "generics": [],  "struct": "XKyberFullKEM"},
+        {"trait": "AloecryptEmpty",           "generics": [],  "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptEncapsulator",    "generics": [],  "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptEncapsulator",    "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptHashable",        "generics": [],  "struct": "KyberPubkey"},
+        {"trait": "AloecryptHashable",        "generics": [],  "struct": "KyberPrivkey"},
+        {"trait": "AloecryptXHashable",       "generics": [],  "struct": "XKyberFullKEM"},
+        {"trait": "AloecryptHashable",        "generics": [],  "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptHashable",        "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptHashableKeypair", "generics": [],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptHashableKeypair", "generics": [],  "struct": "XKyberFullKEM"},
+        {"trait": "AloecryptHashablePubkey",  "generics": [],  "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptPasswordPEM",     "generics":["KyberPublicKEM"], "struct": "KyberFullKEM"},
+        {"trait": "AloecryptPasswordLockable","generics":["XKyberFullKEM"],  "struct": "KyberFullKEM"},
+        {"trait": "AloecryptPEM",             "generics": [], "struct": "XKyberFullKEM"},
+        {"trait": "AloecryptPEM",             "generics": [], "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptPEM",             "generics": [], "struct": "KyberCipher"},
+        {"trait": "AloecryptSignable",        "generics": [], "struct": "KyberFullKEM"},
+        {"trait": "AloecryptSignable",        "generics": [], "struct": "KyberPublicKEM"},
+        {"trait": "AloecryptAddressable",     "generics": [], "struct": "Party"},
+        {"trait": "AloecryptAddressable",     "generics": [], "struct": "CounterParty"},
+        {"trait": "AloecryptAddressable",     "generics": [], "struct": "SessionBuilder"},
+        {"trait": "AloecryptAddressable",     "generics": [], "struct": "AloecryptSession"},
+        {"trait": "IPartyINTRO",              "generics": [], "struct": "PartyINTRO"},
+        {"trait": "ISessionBuilder",          "generics": [], "struct": "SessionBuilder"},
+        {"trait": "AloecryptSessionBuilder",  "generics": [], "struct": "SessionBuilder"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "PartyINTRO"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "PartyCIPHER"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "FullCIPHER"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "CounterPartySECRET"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "PartyCHALLENGE"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "PartyRESPONSE"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "CounterPartyCHALLENGE"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "FromSecretsInput"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "SessionBuilder"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgHELLO"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgSYN"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgACK"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgSYNACK"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgWELCOME"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgGOODBYE"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgRETRY"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "MsgRESYN"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "Party"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "CounterParty"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "AloecryptSession"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "XParty"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "XCounterParty"},
+        {"trait": "AloecryptEmpty",           "generics": [], "struct": "XAloecryptSession"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "PartyINTRO"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "PartyCIPHER"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "FullCIPHER"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "CounterPartySECRET"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "PartyCHALLENGE"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "PartyRESPONSE"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "CounterPartyCHALLENGE"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "FromSecretsInput"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "SessionBuilder"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "MsgHELLO"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "MsgSYN"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "MsgACK"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "MsgSYNACK"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "MsgWELCOME"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "Party"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "CounterParty"},
+        {"trait": "AloecryptHashable",        "generics": [], "struct": "AloecryptSession"},
+        {"trait": "AloecryptXHashable",       "generics": [], "struct": "XAloecryptSession"},
+        {"trait": "AloecryptPasswordPEM",      "generics" : ["CounterParty"],"struct": "AloecryptSession"},
+        {"trait": "AloecryptPasswordLockable", "generics" : ["XAloecryptSession"],"struct": "AloecryptSession"},
+        {"trait": "AloecryptPasswordLockable", "generics" : ["XParty"],"struct": "Party"},
+        {"trait": "AloecryptPasswordLockable", "generics" : ["XCounterParty"],"struct": "CounterParty"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "XAloecryptSession"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgHELLO"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgSYN"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgACK"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgSYNACK"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgWELCOME"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgGOODBYE"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgRETRY"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "MsgRESYN"},
+        {"trait": "IAloecryptSession",         "generics": [], "struct": "AloecryptSession"},
+        {"trait": "AloecryptAddressable",      "generics": [], "struct": "XDilithiumSigner"},
+        {"trait": "AloecryptAddressable",      "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptAddressable",      "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptEmpty",            "generics": [], "struct": "XDilithiumSigner"},
+        {"trait": "AloecryptEmpty",            "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptEmpty",            "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptHashable",         "generics": [], "struct": "DilithiumPubkey"},
+        {"trait": "AloecryptHashable",         "generics": [], "struct": "DilithiumPrivkey"},
+        {"trait": "AloecryptXHashable",        "generics": [], "struct": "XDilithiumSigner"},
+        {"trait": "AloecryptHashable",         "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptHashable",         "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptHashableKeypair",  "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptHashableKeypair",  "generics": [], "struct": "XDilithiumSigner"},
+        {"trait": "AloecryptHashablePubkey",   "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptPasswordPEM",      "generics": ["DilithiumVerifier"] ,"struct": "DilithiumSigner"},
+        {"trait": "AloecryptPasswordLockable", "generics": ["XDilithiumSigner"] ,"struct": "DilithiumSigner"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "XDilithiumSigner"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptPEM",              "generics": [], "struct": "DilithiumSignature"},
+        {"trait": "AloecryptSignable",         "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptSignable",         "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptSigner",           "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "IDilithiumSigner",          "generics": [], "struct": "DilithiumSigner"},
+        {"trait": "AloecryptVerifier",         "generics": [], "struct": "DilithiumVerifier"},
+        {"trait": "AloecryptVerifier" ,        "generics": [], "struct": "DilithiumSigner"}
+    ],
+    "functions": [
+        {
+            "namespace": "util",
+            "functions": [
+                {
+                    "name": "_ts_bytes_now",
+                    "params": [],
+                    "return": "Timestamp"
+                },
+                {
+                    "name": "_address",
+                    "params": [
+                        { "name": "address_seed",        "type": "&str" },
+                        { "name": "addressing_material", "type": "Vec<u8>" }
+                    ],
+                    "return": "AloecryptAddress"
+                },
+                {
+                    "name": "_hash",
+                    "params": [
+                        { "name": "hash_seed",        "type": "&str" },
+                        { "name": "hashing_material", "type": "Vec<u8>" }
+                    ],
+                    "return": "AloecryptHash"
+                }
+            ]
+        },
+        {
+            "namespace": "password",
+            "functions": [
+                {
+                    "name": "password_encrypt",
+                    "params": [
+                        { "name": "bytes",    "type": "&[u8]" },
+                        { "name": "aad",      "type": "&[u8]" },
+                        { "name": "password", "type": "&[u8]" },
+                        { "name": "salt",     "type": "&[u8]" },
+                        { "name": "nonce",    "type": "&ChachaNonce" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptError>"
+                },
+                {
+                    "name": "password_decrypt",
+                    "params": [
+                        { "name": "bytes",    "type": "&[u8]" },
+                        { "name": "aad",      "type": "&[u8]" },
+                        { "name": "password", "type": "&[u8]" },
+                        { "name": "salt",     "type": "&[u8]" },
+                        { "name": "nonce",    "type": "&ChachaNonce" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptError>"
+                }
+            ]
+        },
+        {
+            "namespace": "session.message",
+            "functions": [
+                {
+                    "name": "send_encrypt",
+                    "params": [
+                        { "name": "payload",           "type": "&[u8]" },
+                        { "name": "sender",            "type": "FullCIPHER" },
+                        { "name": "receiver",          "type": "CounterPartySECRET" },
+                        { "name": "session_salt",      "type": "&AloecryptSessionSalt" },
+                        { "name": "receiver_nonce",    "type": "&AloecryptSessionNonce" },
+                        { "name": "receiver_address",  "type": "&AloecryptAddress" },
+                        { "name": "sender_nonce",      "type": "&AloecryptSessionNonce" },
+                        { "name": "sender_address",    "type": "&AloecryptAddress" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptSessionError>"
+                },
+                {
+                    "name": "recv_decrypt",
+                    "params": [
+                        { "name": "payload",           "type": "&[u8]" },
+                        { "name": "sender",            "type": "CounterPartySECRET" },
+                        { "name": "receiver",          "type": "FullCIPHER" },
+                        { "name": "session_salt",      "type": "&AloecryptSessionSalt" },
+                        { "name": "receiver_nonce",    "type": "&AloecryptSessionNonce" },
+                        { "name": "receiver_address",  "type": "&AloecryptAddress" },
+                        { "name": "sender_nonce",      "type": "&AloecryptSessionNonce" },
+                        { "name": "sender_address",    "type": "&AloecryptAddress" }
+                    ],
+                    "return": "Result<Vec<u8>, AloecryptSessionError>"
+                }
+            ]
+        },
+        {
+            "namespace": "session.util",
+            "functions": [
+                {
+                    "name": "make_chacha_nonce",
+                    "params": [
+                        { "name": "nonce_info_tag", "type": "&[u8]" },
+                        { "name": "nonce_seed",     "type": "String" },
+                        { "name": "salt",           "type": "&[u8]" }
+                    ],
+                    "return": "ChachaNonce"
+                },
+                {
+                    "name": "nonce_pair",
+                    "params": [
+                        { "name": "session_salt",  "type": "&AloecryptSessionSalt" },
+                        { "name": "session_seed",  "type": "&str" },
+                        { "name": "stable_seed",   "type": "&str" }
+                    ],
+                    "return": "(ChachaNonce, ChachaNonce)"
+                },
+                {
+                    "name": "session_salt",
+                    "params": [
+                        { "name": "n1", "type": "AloecryptSessionNonce" },
+                        { "name": "n2", "type": "AloecryptSessionNonce" },
+                        { "name": "a1", "type": "AloecryptAddress" },
+                        { "name": "a2", "type": "AloecryptAddress" }
+                    ],
+                    "return": "AloecryptSessionSalt"
+                },
+                {
+                    "name": "cipher_salt",
+                    "params": [
+                        { "name": "seed",               "type": "&[u8]" },
+                        { "name": "session_salt",       "type": "&AloecryptSessionSalt" },
+                        { "name": "decryptor_nonce",    "type": "&AloecryptSessionNonce" },
+                        { "name": "encryptor_nonce",    "type": "&AloecryptSessionNonce" },
+                        { "name": "encryptor_address",  "type": "&AloecryptAddress" }
+                    ],
+                    "return": "AloecryptSessionSalt"
+                }
+            ]
+        }
+    ]
+}

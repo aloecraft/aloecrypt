@@ -1,11 +1,7 @@
 // src/kem/password_pem.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
-use crate::crypt::*;
-
-const KYBER_FULL_TAG: &str = "Aloecrypt KyberFullKEM";
-const KYBER_PUBLIC_TAG: &str = "Aloecrypt KyberPublicKEM";
-const CIPHER_PEM_TAG: &str = "Aloecrypt Cipher";
+use crate::password::*;
 
 impl AloecryptPasswordPEM<KyberPublicKEM> for KyberFullKEM {
     fn pem_hdr_tag() -> String {
@@ -17,9 +13,9 @@ impl AloecryptPasswordPEM<KyberPublicKEM> for KyberFullKEM {
     fn pem_sz() -> usize {
         panic!("Should use XKyberFullKEM PEM ")
     }
-    fn x_pem(&self, password: &[u8], salt: &[u8], mut os_rng: &mut impl SysRng) -> String {
+    fn x_pem(&self, password: &[u8], salt: &[u8], mut rng: &mut dyn CryptoRngCore) -> String {
         let x_kem = self
-            .lock_with_password(&password, &salt, &mut os_rng)
+            .lock_with_password(&password, &salt, &mut rng)
             .expect("lock_with_password failed during PEM export");
         x_kem.pem()
     }
@@ -43,7 +39,7 @@ impl AloecryptPasswordPEM<KyberPublicKEM> for KyberFullKEM {
         Self: Sized,
     {
         let x_kem = XKyberFullKEM::loads(pem)?;
-        Ok(x_kem.read_public())
+        Ok(x_kem.into())
     }
 }
 // Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>

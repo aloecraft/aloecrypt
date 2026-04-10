@@ -3,12 +3,8 @@
 use super::*;
 use crate::consts::*;
 
-pub fn make_chacha_nonce(
-    nonce_info_tag: &[u8],
-    nonce_seed: String,
-    salt: &[u8],
-) -> [u8; CHACHA_NONCE_SZ] {
-    let mut chacha_nonce = [0u8; CHACHA_NONCE_SZ];
+pub fn make_chacha_nonce(nonce_info_tag: &[u8], nonce_seed: String, salt: &[u8]) -> ChachaNonce {
+    let mut chacha_nonce = EMPTY_CRYPT_NONCE;
     let hk = hkdf::Hkdf::<sha2::Sha256>::new(Some(&salt), &nonce_seed.as_bytes());
     hk.expand(&nonce_info_tag.as_bytes(), &mut chacha_nonce)
         .expect("12 bytes is a valid length");
@@ -16,10 +12,10 @@ pub fn make_chacha_nonce(
 }
 
 pub fn nonce_pair(
-    session_salt: &[u8; SESSION_SALT_SZ],
+    session_salt: &AloecryptSessionSalt,
     session_seed: &str,
     stable_seed: &str,
-) -> ([u8; CHACHA_NONCE_SZ], [u8; CHACHA_NONCE_SZ]) {
+) -> (ChachaNonce, ChachaNonce) {
     let session_nonce_bytes = make_chacha_nonce(
         SESSION_CHACHA_NONCE_INFO.as_bytes(),
         session_seed.to_string(),
@@ -36,9 +32,9 @@ pub fn nonce_pair(
 
 pub fn cipher_pair(
     sender_salt: &[u8],
-    sender_secret: &[u8; SECRET_SZ],
+    sender_secret: &AloecryptSecret,
     receiver_salt: &[u8],
-    receiver_secret: &[u8; SECRET_SZ],
+    receiver_secret: &AloecryptSecret,
 ) -> (ChaCha20Poly1305, ChaCha20Poly1305) {
     let session_cipher = make_cipher(
         SESSION_CHACHA_KEY_INFO.as_bytes(),
@@ -54,8 +50,8 @@ pub fn cipher_pair(
     (session_cipher, stable_cipher)
 }
 
-pub fn make_cipher(key_info_tag: &[u8], salt: &[u8], secret: [u8; SECRET_SZ]) -> ChaCha20Poly1305 {
-    let mut chacha_key = [0u8; 32];
+pub fn make_cipher(key_info_tag: &[u8], salt: &[u8], secret: AloecryptSecret) -> ChaCha20Poly1305 {
+    let mut chacha_key = EMPTY_CRYPT_KEY;
     let hk = hkdf::Hkdf::<sha2::Sha256>::new(Some(&salt), &secret);
     hk.expand(&key_info_tag.as_bytes(), &mut chacha_key)
         .expect("32 bytes is a valid length");
@@ -63,11 +59,11 @@ pub fn make_cipher(key_info_tag: &[u8], salt: &[u8], secret: [u8; SECRET_SZ]) ->
 }
 
 pub fn session_salt(
-    n1: [u8; SESSION_NONCE_SZ],
-    n2: [u8; SESSION_NONCE_SZ],
-    a1: [u8; ADDRESS_SZ],
-    a2: [u8; ADDRESS_SZ],
-) -> [u8; SESSION_SALT_SZ] {
+    n1: AloecryptSessionNonce,
+    n2: AloecryptSessionNonce,
+    a1: AloecryptAddress,
+    a2: AloecryptAddress,
+) -> AloecryptSessionSalt {
     let min_n = std::cmp::min(n1, n2);
     let max_n = std::cmp::max(n1, n2);
     let min_a = std::cmp::min(a1, a2);
@@ -89,18 +85,18 @@ pub fn session_salt(
 
 pub fn cipher_salt(
     seed: &[u8],
-    session_salt: &[u8; SESSION_SALT_SZ],
-    decryptor_nonce: &[u8; SESSION_NONCE_SZ],
-    encryptor_nonce: &[u8; SESSION_NONCE_SZ],
-    encryptor_address: &[u8; ADDRESS_SZ],
-) -> [u8; SESSION_SALT_SZ] {
+    session_salt: &AloecryptSessionSalt,
+    decryptor_nonce: &AloecryptSessionNonce,
+    encryptor_nonce: &AloecryptSessionNonce,
+    encryptor_address: &AloecryptAddress,
+) -> AloecryptSessionSalt {
     let mut salt_material: Vec<u8> =
         Vec::with_capacity(SESSION_NONCE_SZ + SESSION_SALT_SZ + ADDRESS_SZ);
     salt_material.extend_from_slice(session_salt);
     salt_material.extend_from_slice(encryptor_nonce);
     salt_material.extend_from_slice(encryptor_address);
 
-    let mut cipher_salt = [0u8; SESSION_SALT_SZ];
+    let mut cipher_salt = EMPTY_SESSION_SALT;
     hkdf::Hkdf::<sha2::Sha256>::new(Some(decryptor_nonce), &seed)
         .expand(&salt_material.as_bytes(), &mut cipher_salt)
         .expect("32 bytes is a valid length");

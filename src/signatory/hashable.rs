@@ -118,6 +118,7 @@ impl AloecryptHashablePubkey for DilithiumVerifier {
         self.dlt_pubkey.hash()
     }
 }
+
 // Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>
 //
 // Licensed under the Apache License, Version 2.0 (the License);

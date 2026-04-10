@@ -6,17 +6,14 @@ use rand_chacha::rand_core::RngCore;
 use rand_chacha::rand_core::RngCore as SysRng;
 use rand_chacha::rand_core::SeedableRng;
 
+use aloecrypt::builder_api::SessionBuilder;
 use aloecrypt::consts::*;
+use aloecrypt::consts_api::*;
 use aloecrypt::error::AloecryptSessionError;
-use aloecrypt::kem::{KyberFullKEM, KyberPublicKEM};
-use aloecrypt::session::builder::SessionBuilder;
-use aloecrypt::session::message::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
-use aloecrypt::signatory::{DilithiumSigner, DilithiumVerifier};
-use aloecrypt::traits::AloecryptSessionBuilder;
-use aloecrypt::traits::{
-    AloecryptDecapsulator, AloecryptEncapsulator, AloecryptPEM, AloecryptPasswordPEM,
-    AloecryptSignable, AloecryptSigner, AloecryptVerifier,
-};
+use aloecrypt::kem_api::{KyberFullKEM, KyberPublicKEM};
+use aloecrypt::message_api::{MsgACK, MsgHELLO, MsgSYN, MsgSYNACK, MsgWELCOME};
+use aloecrypt::signatory_api::{DilithiumSigner, DilithiumVerifier};
+use aloecrypt::traits::*;
 
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{ChaCha20Poly1305, Key as ChaChaKey, Nonce};

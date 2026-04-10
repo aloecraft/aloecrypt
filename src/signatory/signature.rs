@@ -1,14 +1,12 @@
 // src/signatory/signature.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
-
-pub type DilithiumSignature = [u8; SIGNATURE_SZ];
-
 pub struct Authorization {
     address: AloecryptAddress,
     signature: DilithiumSignature,
-    auth_by_address: AloecryptAddress,
-    auth_by_generation: u64,
+    signatory: AloecryptAddress,
+    signatory_root: AloecryptAddress,
+    signatory_generation: u64,
 
     generation: u64,
     from: Timestamp,

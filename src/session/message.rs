@@ -1,99 +1,19 @@
 // src/session/message.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
-use crate::consts::*;
 use crate::error::*;
-use crate::kem::{KyberFullKEM, KyberPublicKEM};
-use crate::session::builder::{
-    CounterPartyCHALLENGE, CounterPartySECRET, FullCIPHER, PartyCHALLENGE, PartyCIPHER, PartyINTRO,
-    PartyRESPONSE,
-};
-use crate::session::util::{cipher_pair, cipher_salt, nonce_pair};
-use crate::signatory::{DilithiumSigner, DilithiumVerifier};
-use crate::types::*;
-
 use crate::option_big_array;
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgHELLO {
-    pub address: AloecryptAddress,
-    pub intro: PartyINTRO,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgSYN {
-    pub syn_to: [u8; SESSION_NONCE_SZ],
-    pub syn_address: [u8; ADDRESS_SZ],
-    pub intro: PartyINTRO,
-    pub cipher: PartyCIPHER,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgACK {
-    pub ack_to: [u8; SESSION_NONCE_SZ],
-    pub ack_address: [u8; ADDRESS_SZ],
-    pub cipher: PartyCIPHER,
-    pub challenge: PartyCHALLENGE,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgSYNACK {
-    pub syn_ack: [u8; SESSION_SALT_SZ],
-    pub challenge: PartyCHALLENGE,
-    pub challenge_response: PartyRESPONSE,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgWELCOME {
-    pub challenge_response: PartyRESPONSE,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgGOODBYE {
-    pub address: AloecryptAddress,
-    pub session_salt: [u8; SESSION_SALT_SZ],
-}
-
-pub struct MsgTRANSPORT {
-    // <-- [New Message] i.e. Let's keep this session but rotate ciphers (Expect ACK)
-    pub session_salt: [u8; SESSION_SALT_SZ],
-    pub payload: [u8],
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgRETRY {
-    pub address: AloecryptAddress,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgROTATE {
-    pub session_salt: [u8; SESSION_SALT_SZ],
-    pub syn_to: [u8; SESSION_NONCE_SZ],
-    pub syn_address: [u8; ADDRESS_SZ],
-    pub cipher: PartyCIPHER,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgRESYN {
-    pub address: AloecryptAddress,
-    pub intro: PartyINTRO,
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct MsgERROR {
-    // <-- [New Message] i.e. Some error was encountered
-    pub address: AloecryptAddress,
-}
+use crate::session::util::{cipher_pair, cipher_salt, nonce_pair};
 
 pub fn send_encrypt(
     payload: &[u8],
     sender: FullCIPHER,
     receiver: CounterPartySECRET,
-    session_salt: &[u8; SESSION_SALT_SZ],
-    receiver_nonce: &[u8; SESSION_NONCE_SZ],
-    receiver_address: &[u8; ADDRESS_SZ],
-    sender_nonce: &[u8; SESSION_NONCE_SZ],
-    sender_address: &[u8; ADDRESS_SZ],
+    session_salt: &AloecryptSessionSalt,
+    receiver_nonce: &AloecryptSessionNonce,
+    receiver_address: &AloecryptAddress,
+    sender_nonce: &AloecryptSessionNonce,
+    sender_address: &AloecryptAddress,
 ) -> Result<Vec<u8>, AloecryptSessionError> {
     let (session_nonce_bytes, stable_nonce_bytes) =
         nonce_pair(&session_salt, NONCE_MSG_SESSION_SEED, NONCE_MSG_STABLE_SEED);
@@ -113,14 +33,6 @@ pub fn send_encrypt(
         sender_nonce,
         sender_address,
     );
-
-    // println!("Send Encrypt:");
-    // println!("receiver_address: {:x?}", receiver_address);
-    // println!("receiver_nonce: {:x?}", receiver_nonce);
-    // println!("receiver_salt: {:x?}", receiver_salt);
-    // println!("sender_address: {:x?}", sender_address);
-    // println!("sender_nonce: {:x?}", sender_nonce);
-    // println!("sender_salt: {:x?}", sender_salt);
 
     let (session_cipher, stable_cipher) = cipher_pair(
         &sender_salt,
@@ -156,11 +68,11 @@ pub fn recv_decrypt(
     payload: &[u8],
     sender: CounterPartySECRET,
     receiver: FullCIPHER,
-    session_salt: &[u8; SESSION_SALT_SZ],
-    receiver_nonce: &[u8; SESSION_NONCE_SZ],
-    receiver_address: &[u8; ADDRESS_SZ],
-    sender_nonce: &[u8; SESSION_NONCE_SZ],
-    sender_address: &[u8; ADDRESS_SZ],
+    session_salt: &AloecryptSessionSalt,
+    receiver_nonce: &AloecryptSessionNonce,
+    receiver_address: &AloecryptAddress,
+    sender_nonce: &AloecryptSessionNonce,
+    sender_address: &AloecryptAddress,
 ) -> Result<Vec<u8>, AloecryptSessionError> {
     let (session_nonce_bytes, stable_nonce_bytes) =
         nonce_pair(&session_salt, NONCE_MSG_SESSION_SEED, NONCE_MSG_STABLE_SEED);
@@ -180,14 +92,6 @@ pub fn recv_decrypt(
         sender_nonce,
         sender_address,
     );
-
-    // println!("Recv Decrypt:");
-    // println!("receiver_address: {:x?}", receiver_address);
-    // println!("receiver_nonce: {:x?}", receiver_nonce);
-    // println!("receiver_salt: {:x?}", receiver_salt);
-    // println!("sender_address: {:x?}", sender_address);
-    // println!("sender_nonce: {:x?}", sender_nonce);
-    // println!("sender_salt: {:x?}", sender_salt);
 
     let (session_cipher, stable_cipher) = cipher_pair(
         &sender_salt,

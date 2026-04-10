@@ -11,8 +11,6 @@ src = "src/lib.rs"
 curve25519-dalek = "4.1"
 sha2 = "0.10"
 thiserror = "1.0"
-ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-x25519-dalek = { version = "2.0", features = ["static_secrets"] }
 rand_core = "0.10"
 chacha20poly1305 = "0.10"
 pbkdf2 = "0.12"
@@ -26,10 +24,9 @@ serde-reflection = "0.5.2"
 serde-big-array = "0.5.1"
 regex = "1.12.3"
 lz4_flex = "0.12.0"
-keccak = { version = "=0.2.0-rc.2" }
+sha3 = {version = "0.11.0-rc.7", default-features = false}
 ml-kem = {version="0.3.0-rc.0"}
-# Forks tag: ml-dsa-0.1.0-rc.7 & resolves: https://github.com/RustCrypto/signatures/pull/1257
-ml-dsa = { git = "https://github.com/mgodf89/signatures.git", branch="issue1256_mldsa_from_seed_memory_leak", features = ["rand_core"]}
+ml-dsa = { version="0.1.0-rc.8", features = ["rand_core"]}
 rand_chacha = "0.10.0"
 zerocopy = "0.8.40"
 hybrid-array = "0.4.7"
@@ -58,3 +55,7 @@ x25519-dalek = { version = "2.0", features = ["static_secrets"] }
 wasm-bindgen-test = "0.3.12"
 tokio-test = "0.4"
 stacker = "0.1"
+
+
+[build-dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }

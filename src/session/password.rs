@@ -1,52 +1,102 @@
 // src/session/password.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
-use super::party::*;
 use super::*;
-use crate::consts::*;
-use crate::crypt::*;
-use crate::kem::*;
-use crate::signatory::*;
-use crate::traits::*;
-use crate::types::*;
 
-use rand_core::RngCore;
+impl AloecryptPasswordLockable<XAloecryptSession> for AloecryptSession {
+    fn lock_with_password(
+        &self,
+        password: &[u8],
+        salt: &[u8],
+        mut rng: &mut dyn CryptoRngCore,
+    ) -> Result<XAloecryptSession, AloecryptError> {
+        let x_party = self.party.lock_with_password(password, salt, &mut rng)?;
+        let x_counter_party = self
+            .counter_party
+            .lock_with_password(password, salt, &mut rng)?;
+        let x_session_salt_vec = password_encrypt(
+            &self.session_salt,
+            &[0u8],
+            password,
+            salt,
+            &x_counter_party.crypt_nonce,
+        )?;
+        let x_session_salt: XAloecryptSessionSalt = x_session_salt_vec
+            .try_into()
+            .map_err(|_| AloecryptError::PasswordEncrypt)?;
+        Ok(XAloecryptSession {
+            x_party,
+            x_counter_party,
+            x_session_salt,
+            un_hash: self.hash(),
+            priv_hash: self.priv_hash(),
+        })
+    }
+
+    fn unlock_with_password(
+        x_obj: XAloecryptSession,
+        password: &[u8],
+        salt: &[u8],
+    ) -> Result<Self, AloecryptError>
+    where
+        Self: Sized,
+    {
+        let party = Party::unlock_with_password(x_obj.x_party, password, salt)?;
+        let counter_party =
+            CounterParty::unlock_with_password(x_obj.x_counter_party, password, salt)?;
+        let session_salt_vec = password_decrypt(
+            &x_obj.x_session_salt,
+            &[0u8],
+            password,
+            salt,
+            &x_obj.x_counter_party.crypt_nonce,
+        )?;
+        let session_salt = session_salt_vec
+            .try_into()
+            .map_err(|_| AloecryptError::PasswordDecrypt)?;
+        Ok(Self {
+            party,
+            counter_party,
+            session_salt,
+        })
+    }
+}
 
 impl AloecryptPasswordLockable<XParty> for Party {
     fn lock_with_password(
         &self,
         password: &[u8],
         salt: &[u8],
-        mut os_rng: &mut dyn SysRng,
+        mut rng: &mut dyn CryptoRngCore,
     ) -> Result<XParty, AloecryptError> {
-        let x_delegate_signer =
-            self.delegate_signer
-                .lock_with_password(password, salt, &mut os_rng)?;
+        let x_delegate_signer = self
+            .delegate_signer
+            .lock_with_password(password, salt, &mut rng)?;
         let x_stable_kem = self
             .stable_kem
-            .lock_with_password(password, salt, &mut os_rng)?;
+            .lock_with_password(password, salt, &mut rng)?;
         let x_session_kem = self
             .session_kem
-            .lock_with_password(password, salt, &mut os_rng)?;
+            .lock_with_password(password, salt, &mut rng)?;
 
         let x_stable_secret_vec = password_encrypt(
             &self.stable_secret,
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_session_kem.nonce),
+            &x_session_kem.nonce,
         )?;
         let x_session_secret_vec = password_encrypt(
             &self.session_secret,
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_session_kem.nonce),
+            &x_session_kem.nonce,
         )?;
 
-        let x_stable_secret: [u8; SECRET_SZ + ENCRYPTED_TAG_SZ] = x_stable_secret_vec
+        let x_stable_secret: XAloecryptSecret = x_stable_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordEncrypt)?;
-        let x_session_secret: [u8; SECRET_SZ + ENCRYPTED_TAG_SZ] = x_session_secret_vec
+        let x_session_secret: XAloecryptSecret = x_session_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordEncrypt)?;
 
@@ -76,20 +126,20 @@ impl AloecryptPasswordLockable<XParty> for Party {
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_obj.x_session_kem.nonce),
+            &x_obj.x_session_kem.nonce,
         )?;
         let session_secret_vec = password_decrypt(
             &x_obj.x_session_secret,
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_obj.x_session_kem.nonce),
+            &x_obj.x_session_kem.nonce,
         )?;
 
-        let stable_secret: [u8; SECRET_SZ] = stable_secret_vec
+        let stable_secret: AloecryptSecret = stable_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordDecrypt)?;
-        let session_secret: [u8; SECRET_SZ] = session_secret_vec
+        let session_secret: AloecryptSecret = session_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordDecrypt)?;
 
@@ -110,30 +160,20 @@ impl AloecryptPasswordLockable<XCounterParty> for CounterParty {
         &self,
         password: &[u8],
         salt: &[u8],
-        mut os_rng: &mut dyn SysRng,
+        rng: &mut dyn CryptoRngCore,
     ) -> Result<XCounterParty, AloecryptError> {
-        let mut crypt_nonce = [0u8; CHACHA_NONCE_SZ];
-        os_rng.try_fill_bytes(&mut crypt_nonce);
+        let mut crypt_nonce = EMPTY_CRYPT_NONCE;
+        rng.fill_bytes(&mut crypt_nonce);
 
-        let x_stable_secret_vec = password_encrypt(
-            &self.stable_secret,
-            &[0u8],
-            password,
-            salt,
-            CryptNonce::load(&crypt_nonce),
-        )?;
-        let x_session_secret_vec = password_encrypt(
-            &self.session_secret,
-            &[0u8],
-            password,
-            salt,
-            CryptNonce::load(&crypt_nonce),
-        )?;
+        let x_stable_secret_vec =
+            password_encrypt(&self.stable_secret, &[0u8], password, salt, &crypt_nonce)?;
+        let x_session_secret_vec =
+            password_encrypt(&self.session_secret, &[0u8], password, salt, &crypt_nonce)?;
 
-        let x_stable_secret: [u8; SECRET_SZ + ENCRYPTED_TAG_SZ] = x_stable_secret_vec
+        let x_stable_secret: XAloecryptSecret = x_stable_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordEncrypt)?;
-        let x_session_secret: [u8; SECRET_SZ + ENCRYPTED_TAG_SZ] = x_session_secret_vec
+        let x_session_secret: XAloecryptSecret = x_session_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordEncrypt)?;
 
@@ -160,20 +200,20 @@ impl AloecryptPasswordLockable<XCounterParty> for CounterParty {
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_obj.crypt_nonce),
+            &x_obj.crypt_nonce,
         )?;
         let session_secret_vec = password_decrypt(
             &x_obj.x_session_secret,
             &[0u8],
             password,
             salt,
-            CryptNonce::load(&x_obj.crypt_nonce),
+            &x_obj.crypt_nonce,
         )?;
 
-        let stable_secret: [u8; SECRET_SZ] = stable_secret_vec
+        let stable_secret: AloecryptSecret = stable_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordDecrypt)?;
-        let session_secret: [u8; SECRET_SZ] = session_secret_vec
+        let session_secret: AloecryptSecret = session_secret_vec
             .try_into()
             .map_err(|_| AloecryptError::PasswordDecrypt)?;
 

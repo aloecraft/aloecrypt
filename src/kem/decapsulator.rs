@@ -1,10 +1,19 @@
-// src/signatory/keys.rs
+// src/kem/decapsulator.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
 use super::*;
 
-pub type DilithiumPubkey = [u8; VERIFY_KEY_SZ];
-pub type DilithiumPrivkey = [u8; SIGN_KEY_SZ];
-pub type XDilithiumPrivkey = [u8; SIGN_KEY_SZ + ENCRYPTED_TAG_SZ];
+impl AloecryptDecapsulator for KyberFullKEM {
+    fn decapsulation_key(&self) -> KyberPrivkey {
+        self.kyb_privkey
+    }
+
+    fn decapsulate(&self, cipher: KyberCipher) -> AloecryptSecret {
+        DecapsulationKey::<MlKem768>::from_expanded(&self.kyb_privkey.into())
+            .unwrap()
+            .decapsulate((&cipher).into())
+            .into()
+    }
+}
 // Copyright Michael Godfrey 2026 | aloecraft.org <michael@aloecraft.org>
 //
 // Licensed under the Apache License, Version 2.0 (the License);

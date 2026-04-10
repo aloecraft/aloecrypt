@@ -1,8 +1,6 @@
 // src/session/password_pem.rs
 // License: Apache-2.0 (disclaimer at bottom of file)
-use super::session::*;
 use super::*;
-use crate::crypt::*;
 
 impl AloecryptPasswordPEM<CounterParty> for AloecryptSession {
     fn pem_hdr_tag() -> String {
@@ -15,9 +13,9 @@ impl AloecryptPasswordPEM<CounterParty> for AloecryptSession {
         panic!("Should use XAloecryptSession PEM")
     }
 
-    fn x_pem(&self, password: &[u8], salt: &[u8], mut os_rng: &mut impl SysRng) -> String {
+    fn x_pem(&self, password: &[u8], salt: &[u8], mut rng: &mut dyn CryptoRngCore) -> String {
         let x_session = self
-            .lock_with_password(password, salt, &mut os_rng)
+            .lock_with_password(password, salt, &mut rng)
             .expect("lock_with_password failed during PEM export");
         x_session.pem()
     }
